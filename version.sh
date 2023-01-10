@@ -43,5 +43,5 @@ then
 else
 	#advisory information
 	echo "New Apache version available for download. Please visit httpd.apache.org/download.cgi for more information"
-	echo "Alternatively you may want to run the command 'sudo apt-get update && sudo apt-get upgrade'
+	echo "Alternatively you may want to run the command 'sudo apt-get update && sudo apt-get upgrade'"
 fi
