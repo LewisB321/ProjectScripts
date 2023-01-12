@@ -5,10 +5,11 @@ source methods.sh
 source jsversion.sh
 
 #flag for specifying the host (can be IP or domain)
-while getopts h: flag
+while getopts h:p flag
 do
 	case "${flag}" in
 		h) host=${OPTARG};;
+		p) publicsite=${OPTARG};;
 	esac
 done
 
@@ -39,6 +40,23 @@ echo -e "\nBeginning the identification of supported Javascript version(s). This
 
 test1-xpoweredby
 test2-nmapscript
+test3-mention
+test4-resourceaccess
+
+#optional test which depends on whether the site is publicly available or not
+#uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
+if echo $* | grep -e "-p" -q
+then
+	if [[ $4 == "yes" ]]
+	then
+		false
+		#placeholder
+	else
+		false
+	fi
+else
+	false
+fi
 
 
 
