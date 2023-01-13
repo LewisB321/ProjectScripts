@@ -33,10 +33,11 @@ test2-nmapscript(){
 	test2=$(echo $nmap_results | wc -w)
 
 	#testing
+	#echo $nmap_results
 	#echo $test2
 
 	#variable will be empty if JS version was identified by the script
-	if [[ $test2 == 0 ]]
+	if [[ $test2 != 0 ]]
 	then
 		echo "test2 has not identified JS version(s)"
 	else
@@ -80,7 +81,7 @@ test4-resourceaccess() {
 		echo "test4 has not identified JS version(s)"
 	else
 		resourcecontents=$(curl -s $host/resources/ )
-		jsfiles=$(echo $resourcecontents | grep -oP '(?<=href=")[^"]*\.js' | awk '{print $5}')
+		jsfiles=$(echo $resourcecontents)
 		
 		#decides whether anything with the .js extension has been found
 		if [[ $jsfiles == 0 ]]
@@ -93,5 +94,36 @@ test4-resourceaccess() {
 			#it picks up all files with the js extension but can't seperate it
 		fi
 	fi
+
+}
+
+test5-wappalyzer(){
+
+	#this 'hidden' test will use the wappalyzer api as a last resort to try and find any js libraries and version used
+	#since this is a public service it will only work on public domains. 
+	#As such, it's accessed by a flag
+
+	#comment the below when not using
+	#wappresults=$(curl -H "x-api-key: n690XzXXMv3VtoJVcyzhWPr8geusC7B3avX5ZJra" "https://api.wappalyzer.com/lookup/v1/?url=$host")
+
+	#read the raw output from the API into an array seperated by commas
+	IFS=',' read -r -A wapparray <<< $wappresults
+	
+	#testing
+	#for element in ${wapparray[@]}
+	#do
+		#echo $element
+	#done
+
+	#does not work
+	#for ((i=0; i<${#wapparray[@]}; i++))
+	#do
+		#if echo ${array[i]} | grep -w "JavaScript" > /dev/null
+		#then
+			#next_index=$((i+1))
+			#echo "${array[next_index]}"
+		#fi
+	#done
+
 
 }

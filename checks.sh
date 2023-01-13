@@ -5,11 +5,12 @@ source methods.sh
 source jsversion.sh
 
 #flag for specifying the host (can be IP or domain)
-while getopts h:p flag
+while getopts h:p:f: flag
 do
 	case "${flag}" in
 		h) host=${OPTARG};;
 		p) publicsite=${OPTARG};;
+		f) force=${OPTARG};;
 	esac
 done
 
@@ -24,8 +25,18 @@ if [[ $? == 0 ]]
 then
 	echo "The host appears to be online. Moving on"
 else
-	echo "The host appears to be offline. Please check the host's availability"
+	echo "The host appears to be offline or not responding to a pingtest. "
 	exit 1
+	#if echo $* | grep -e "-p" -q
+	#then
+		#if [[ $5 != "y" ]]
+		#then
+			#echo -e "\nStopping script execution"
+			#exit 1
+		#else
+			#echo -e "'nForce flag detected. Moving on"
+		#fi
+	#fi
 fi
 
 echo -e "\nNow querying the host's web server version"
@@ -47,7 +58,7 @@ test4-resourceaccess
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
 if echo $* | grep -e "-p" -q
 then
-	if [[ $4 == "yes" ]]
+	if [[ $publicsite == "y" ]]
 	then
 		false
 		#placeholder
@@ -57,6 +68,9 @@ then
 else
 	false
 fi
+
+
+
 
 
 
