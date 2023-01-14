@@ -67,6 +67,7 @@ test3-mention(){
 		echo "test3 has not identified JS version(s)"
 	else
 		echo "Javascript version identified as PLACEHOLDER"
+		echo $webpage
 	fi
 }
 
@@ -89,7 +90,6 @@ test4-resourceaccess() {
 			echo "test4 has not identified JS version(s)"
 		else
 			echo "js identified PLACEHOLDER"
-			echo $jsfiles
 			#echo $jsfiles #just dump it for now, not sure how to work with this using grep.
 			#it picks up all files with the js extension but can't seperate it
 		fi
@@ -102,19 +102,27 @@ test5-wappalyzer(){
 	#this 'hidden' test will use the wappalyzer api as a last resort to try and find any js libraries and version used
 	#since this is a public service it will only work on public domains. 
 	#As such, it's accessed by a flag
+	#the custom API key is free and limited use
 
 	#comment the below when not using
-	#wappresults=$(curl -H "x-api-key: n690XzXXMv3VtoJVcyzhWPr8geusC7B3avX5ZJra" "https://api.wappalyzer.com/lookup/v1/?url=$host")
+	wappresults=$(curl -sH "x-api-key: n690XzXXMv3VtoJVcyzhWPr8geusC7B3avX5ZJra" "https://api.wappalyzer.com/lookup/v1/?url=$host")
 
-	#read the raw output from the API into an array seperated by commas
-	IFS=',' read -r -A wapparray <<< $wappresults
+
+	#the api call will return invalid if the remote host can't be found. This if statement is to determine this
+	#and only print the output if the test was successful
+	if echo $wappresults | grep -q "Invalid"
+	then
+		echo "test5 has not been able to identify JavaScript version(s)"
+	else
+		#read the raw output from the API into an array seperated by commas
+		IFS=',' read -ra wapparray <<< $wappresults
+		#prints the array. Must find a way to clean this up
+		echo "This is just the raw output for now. Must find a way to refine output!!!"
+		echo ${wapparray[@]}
+		#temporary output
+		echo "test5 has been able to identify JavaScript version(s)"
+	fi
 	
-	#testing
-	#for element in ${wapparray[@]}
-	#do
-		#echo $element
-	#done
-
 	#does not work
 	#for ((i=0; i<${#wapparray[@]}; i++))
 	#do

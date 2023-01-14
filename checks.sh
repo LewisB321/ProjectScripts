@@ -26,17 +26,17 @@ then
 	echo "The host appears to be online. Moving on"
 else
 	echo "The host appears to be offline or not responding to a pingtest. "
-	exit 1
-	#if echo $* | grep -e "-p" -q
-	#then
-		#if [[ $5 != "y" ]]
-		#then
-			#echo -e "\nStopping script execution"
-			#exit 1
-		#else
-			#echo -e "'nForce flag detected. Moving on"
-		#fi
-	#fi
+	#exit 1
+	if echo $* | grep -e "-f" -q
+	then
+		if [[ $force != "y" ]]
+		then
+			echo -e "\nStopping script execution"
+			exit 1
+		else
+			echo -e "'nForce flag detected. Moving on"
+		fi
+	fi
 fi
 
 echo -e "\nNow querying the host's web server version"
@@ -60,8 +60,7 @@ if echo $* | grep -e "-p" -q
 then
 	if [[ $publicsite == "y" ]]
 	then
-		false
-		#placeholder
+		test5-wappalyzer
 	else
 		false
 	fi
