@@ -3,6 +3,7 @@
 source version.sh
 source methods.sh
 source jsversion.sh
+source https-ciphers.sh
 
 #flag for specifying the host (can be IP or domain)
 while getopts h:p:f: flag
@@ -68,8 +69,22 @@ else
 	false
 fi
 
+echo -e "\nNow probing target to determine TLS ciphersuite"
 
+#the below code will make a curl request to see if host responds to https requests. Will be empty
+#if https is unavailable, meaning the ciphersuite analysis will be bypassed
+#could do this using openssl -connect but this achieves the same goal
+httpscheck=$(curl -s https://$host)
+httpscheck_wc=$(echo $httpscheck | wc -w)
 
+#enum_ciphers isn't playing nice within the main script. Must fix!!!!
+if [[ $httpscheck_wc == 0 ]]
+then
+	echo "Host is unsuitable for ciphersuite analysis"
+else
+	echo "Host is suitable for ciphersuite analysis"
+	#enum_ciphers
+fi
 
 
 

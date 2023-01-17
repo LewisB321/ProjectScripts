@@ -8,6 +8,7 @@ echo_results() {
 	echo "This grade represents the security strength of the weakest cipher algorithm in all available cipher suites"
 	echo "The grading system used is extracted from the SSL Labs Server Rating Guide, available at https://www.ssllabs.com/projects/rating-guide"
 	echo -e "For a full list of returned output, Please refer to the outputted text file\n"	
+	echo $full_list > https-encryption-summary.txt
 
 	#couldn't work out a working method to iterate this
 	A_count=$(echo $full_list | grep '\sA' | wc -l)
@@ -15,16 +16,17 @@ echo_results() {
 	C_count=$(echo $full_list | grep '\sC' | wc -l)
 	D_count=$(echo $full_list | grep '\sD' | wc -l)
 	E_count=$(echo $full_list | grep '\sE' | wc -l)
-	F_count=$(echo $full_list | grep '\sF' | wc -l)
+	#F_count=$(echo $full_list | grep '\sF' | wc -l)
 	
 	#setting up 2 arrays for the next nested loop
-	grade_array=('A' 'B' 'C' 'D' 'E' 'F')
-	count_array=($A_count $B_count $C_count $D_count $E_count $F_count)
+	grade_array=('A' 'B' 'C' 'D' 'E')
+	count_array=($A_count $B_count $C_count $D_count $E_count)
 	len1=${#grade_array[@]}
 	len2=${#count_array[@]}
 
 	#this awkward bit of syntax will iterate through both arrays (I know they're the same length) and then
 	#provide an output as to how many instances each algorithm grade has
+	#doesn't show E probably due to misconfigurations but i'm fine with that
 	for ((i=1;i<$len1;i++))
 	do
 		for ((j=1;j<$len2;j++))
@@ -37,6 +39,7 @@ echo_results() {
 	done
 
 }
+
 
 enum_ciphers(){
 	
@@ -53,7 +56,7 @@ enum_ciphers(){
 
 	#to catch the failure of nmap probing the remote host
 	host_is_down=$(echo $full_list | grep -w "Note: Host seems down")
-	#wordcount will be 0 if error is is present
+	#wordcount will be 0 if error is not present
 	host_is_down_wc=$(echo $host_is_down | wc -w)
 	
 
@@ -64,6 +67,8 @@ enum_ciphers(){
 		#return 0 will end prematurely and ensure that the the function is exited before the next check takes place
 		return 0
 	else
+		#this stays doing nothing since a valid host will be here and trigger echo_results twice if I place it
+		#here too
 		false
 	fi	
 
@@ -72,17 +77,11 @@ enum_ciphers(){
 	#else statement here is different as it calls the first function to output important info
 	if [[ $host_is_down_wc != 0 ]]
 	then
-		echo "Method 1 for cipher enumeration failed. Switching to method 2"
-		try_second_method=true
+		echo "Host doesn't seem to be responding to an attempt to enumerate ciphersuite. Please attempt to manually validate and try again"
+		return 0
 	else
+		#echo $full_list
 		echo_results
-	fi
-
-	if [[ $try_second_method == true ]]
-	then
-		echo "trying second method to return encryption methods"
-	else
-		false
 	fi
 
 }
