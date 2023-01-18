@@ -13,7 +13,7 @@ httpmethods(){
 	#testing
 	#echo ${MethodsArray[@]}
 
-	#parse the array for unsecure methods. Definitely an easier way to do this
+	#parse the array for unsecure methods. Definitely an easier way to do this so i'll come back to it later
 	unsecuremethodcounter=0
 	for httpmethod in ${MethodsArray[@]}; do
 		[[ "PUT" == $httpmethod ]] && ((unsecuremethodcounter=unsecuremethodcounter+1))

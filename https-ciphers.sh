@@ -43,10 +43,9 @@ echo_results() {
 
 enum_ciphers(){
 	
-	#This test will use a combination of sslclient & nmap to determine the encryption algorithms used on the remote host
-
+	#This test will use nmap to determine the encryption algorithms used on the remote host
 	full_list=$(nmap --script ssl-enum-ciphers -p 443 $host)
-	#echo $full_list
+	echo $full_list
 
 	#to catch the failed to resolve hostname error if nmap can't understand the hostname
 	failed_to_resolve=$(echo $full_list | grep -w "0 IP addresses")
@@ -71,6 +70,21 @@ enum_ciphers(){
 		#here too
 		false
 	fi	
+
+	#the below code will make a curl request to see if host responds to https requests. Will be empty
+	#if https is unavailable, meaning the ciphersuite analysis will be bypassed
+	#could do this using openssl -connect but this achieves the same goal
+	httpscheck=$(curl -s https://$host)
+	httpscheck_wc=$(echo $httpscheck | wc -w)
+
+	#enum_ciphers isn't playing nice within the main script. Must fix!!!!
+	if [[ $httpscheck_wc == 0 ]]
+	then
+		echo "Host is unsuitable for ciphersuite analysis (cannot be contacted on port 443)"
+		return 0
+	else
+		echo "Host is suitable for ciphersuite analysis"
+	fi
 
 	#condition if the hostname is valid but host is blocking the nmap probe. Will activitae an internal flag
 	#so that the function will try the second method of enumerating ciphersuites

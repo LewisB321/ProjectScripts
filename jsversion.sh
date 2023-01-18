@@ -14,9 +14,11 @@ test1-xpoweredby(){
 	#variable won't be empty if the header was retrieved
 	if [[ $test1 == 0 ]]
 	then
-		echo "test1 has not identified JS version(s)"
+		echo "First test (Header exposed info) has not identified JS version(s)"
 	else
-		echo "Javascript version identified as PLACEHOLDER"
+		echo "First test (Header exposed info) has potentially been able to identify JS version(s)"
+		echo "Raw header info output: "$Header_Info
+		found=true
 	fi
 }
 
@@ -39,9 +41,11 @@ test2-nmapscript(){
 	#variable will be empty if JS version was identified by the script
 	if [[ $test2 != 0 ]]
 	then
-		echo "test2 has not identified JS version(s)"
+		echo "Second test (nmap http-referer script) has not identified JS version(s)"
 	else
-		echo "Javascript version identified as PLACEHOLDER"
+		echo "Second test (nmap http-referer script) has potentailly been able to identify JS version(s)"
+		echo "Raw nmap script output: " $nmap_scan
+		found=true
 	fi
 }
 
@@ -64,10 +68,11 @@ test3-mention(){
 
 	if [[ $test3 == 0 ]]
 	then
-		echo "test3 has not identified JS version(s)"
+		echo "Third test (Mention in body) has not identified JS version(s)"
 	else
-		echo "Javascript version identified as PLACEHOLDER"
-		echo $webpage
+		echo "Third test (Mention in body) has potentially identified JS version(s)"
+		echo "Raw mention output: " $webpage
+		found=true
 	fi
 }
 
@@ -79,19 +84,21 @@ test4-resourceaccess() {
 	returncode=$(curl -sI $host/resources/ | grep "HTTP" | awk '{print $2}')
 	if [[ $returncode != 200 ]]
 	then
-		echo "test4 has not identified JS version(s)"
+		echo "Fourth test (/resources folder) has not identified JS version(s)"
 	else
 		resourcecontents=$(curl -s $host/resources/ )
-		jsfiles=$(echo $resourcecontents)
+		jsfiles=$(echo $resourcecontents | grep -o '.js')
 		
 		#decides whether anything with the .js extension has been found
 		if [[ $jsfiles == 0 ]]
 		then
-			echo "test4 has not identified JS version(s)"
+			echo "Fourth test (/resources folder) has not identified JS version(s)"
 		else
-			echo "js identified PLACEHOLDER"
-			#echo $jsfiles #just dump it for now, not sure how to work with this using grep.
-			#it picks up all files with the js extension but can't seperate it
+			echo "Fourth test (/resources folder has potentailly identified JS version(s)"
+			#echo "Raw /resources output: " $resourcecontents
+			echo "Below are all the discovered files in /resources that contain the .js extension"
+			echo $jsfiles
+			found=true
 		fi
 	fi
 
@@ -112,15 +119,13 @@ test5-wappalyzer(){
 	#and only print the output if the test was successful
 	if echo $wappresults | grep -q "Invalid"
 	then
-		echo "test5 has not been able to identify JavaScript version(s)"
+		echo "Fifth test (Wappalyzer) has not been able to identify JavaScript version(s)"
 	else
 		#read the raw output from the API into an array seperated by commas
 		IFS=',' read -ra wapparray <<< $wappresults
 		#prints the array. Must find a way to clean this up
-		echo "This is just the raw output for now. Must find a way to refine output!!!"
-		echo ${wapparray[@]}
-		#temporary output
-		echo "test5 has been able to identify JavaScript version(s)"
+		echo "Raw Wappalyzer output: " ${warrarray[@]}
+		found=true
 	fi
 	
 	#does not work

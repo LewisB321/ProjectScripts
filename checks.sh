@@ -6,7 +6,7 @@ source jsversion.sh
 source https-ciphers.sh
 
 #flag for specifying the host (can be IP or domain)
-while getopts h:p:f: flag
+while getopts h:p:f:o: flag
 do
 	case "${flag}" in
 		h) host=${OPTARG};;
@@ -15,8 +15,11 @@ do
 	esac
 done
 
-#testing
-#echo $host
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "Thank you for using this script. This brief script will" 
+echo "hopefully be able to discover basic components of the remote"
+echo "host using common enumeration techniques"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 #pingtest for host's availability. WIll exit if host is unreachable
 ping $host -q -c 4 2>&1 >/dev/null
@@ -35,7 +38,7 @@ else
 			echo -e "\nStopping script execution"
 			exit 1
 		else
-			echo -e "'nForce flag detected. Moving on"
+			echo -e "\nForce flag detected. Moving on"
 		fi
 	fi
 fi
@@ -50,6 +53,7 @@ httpmethods
 
 echo -e "\nBeginning the identification of supported Javascript version(s). This may take a while"
 
+found=false
 test1-xpoweredby
 test2-nmapscript
 test3-mention
@@ -69,21 +73,34 @@ else
 	false
 fi
 
+if [[ $found == false ]]
+then
+	echo -e "\nSupported JavaScript version(s)/libraries unable to be discovered"
+else
+	echo -e "\nFound JavaScript placeholder"
+fi
+
 echo -e "\nNow probing target to determine TLS ciphersuite"
 
-#the below code will make a curl request to see if host responds to https requests. Will be empty
-#if https is unavailable, meaning the ciphersuite analysis will be bypassed
-#could do this using openssl -connect but this achieves the same goal
-httpscheck=$(curl -s https://$host)
-httpscheck_wc=$(echo $httpscheck | wc -w)
+#enum_ciphers is not playing nice in the main script due to a different output from nmap messing up the rest of the function. MUST FIX!!!!
+#enum_ciphers
 
-#enum_ciphers isn't playing nice within the main script. Must fix!!!!
-if [[ $httpscheck_wc == 0 ]]
+read -p "Would you like to output this summary to a text file? (Y/N)" output
+
+if [[ $output == 'y' ]]
 then
-	echo "Host is unsuitable for ciphersuite analysis"
+	echo "Outputting information to text file remote-host-summary.txt"
+	touch remote-host-summary.txt
+	#Web server output
+	echo "Webserver: "$version >> remote-host-summary.txt
+	#http methods output
+	echo "Methods: "$methods >> remote-host-summary.txt 
+	#js version(s) output
+	echo "Placeholder for JS" >> remote-host-summary.txt
+	#ciphersuite analysis output
+	echo "Placeholder for Ciphersuite analysis" >> remote-host-summary.txt
 else
-	echo "Host is suitable for ciphersuite analysis"
-	#enum_ciphers
+	false
 fi
 
 
