@@ -61,17 +61,17 @@ test4-resourceaccess
 
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
-if echo $* | grep -e "-p" -q
-then
-	if [[ $publicsite == "y" ]]
-	then
-		test5-wappalyzer
-	else
-		false
-	fi
-else
-	false
-fi
+#if echo $* | grep -e "-p" -q
+#then
+	#if [[ $publicsite == "y" ]]
+	#then
+		#test5-wappalyzer
+	#else
+		#false
+	#fi
+#else
+	#false
+#fi
 
 if [[ $found == false ]]
 then
