@@ -2,7 +2,7 @@
 
 source version.sh
 source methods.sh
-source jsversion.sh
+source js+phpversion.sh
 source https-ciphers.sh
 
 #flag for specifying the host (can be IP or domain)
@@ -51,7 +51,7 @@ echo -e "\nBeginning test for supported http methods on the host"
 
 httpmethods
 
-echo -e "\nBeginning the identification of supported Javascript version(s). This may take a while"
+echo -e "\nBeginning the identification of supported Javascript/PHP version(s). This may take a while"
 
 found=false
 test1-xpoweredby
