@@ -1,59 +1,86 @@
 #! /bin/bash
 
-test1-xpoweredby(){
+test1-phpinfo(){
+	 #this test will use curl to check the response to access attempts for phpinfo in its default location
 
-	#test-1 try to retrieve x-powered-by header information. Conditional statement for whether https should be tried
+	 php_returncode=$(curl -sI $host/phpinfo.php | grep "HTTP" | awk '{print $2}')
+	 #echo $php_returncode
+	 if [[ $php_returncode != 302 ]]
+	 then
+	 	echo -e "\nFirst test (phpinfo.php) was unsuccessful"
+	 else
+	 	echo -e "\nFirst test (phpinfo.php) was potentially successful. Host is advertising php info at {host}/phpinfo.php"
+	 fi
+}
+
+test2-phpmyadmin(){
+	 #this test will use curl to check the response to access attempts for phpmyadmin in its default location
+
+	 myadmin_returncode=$(curl -sI $host/phpmyadmin | grep "HTTP" | awk '{print $2}')
+	 #echo $myadmin_returncode
+	 if [[ $myadmin_returncode != 302 ]]
+	 then
+	 	echo -e "\nSecond test (phpmyadmin) was unsuccessful"
+	 else
+	 	echo -e "\nSecond test (phpmyadmin) was potentially successful. Host is advertising php dashboard at {host}/phpmyadmin"
+	 fi
+}
+
+test3-xpoweredby(){
+
+	#test-3 try to retrieve x-powered-by header information. Conditional statement for whether https should be tried
 	if [[ $publicsite == 'y' ]]
 	then
 		Header_Info=$(curl -sI https://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
 	else
 		Header_Info=$(curl -sI http://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
 	fi
-	echo $Header_Info
+	#echo $Header_Info
 	#use to store the wordcount
-	test1=$(echo $Header_Info | wc -w)
+	test3=$(echo $Header_Info | wc -w)
 
 	#testing
-	#echo $test1
+	#echo $test3
 
 	#variable won't be empty if the header was retrieved
-	if [[ $test1 == 0 ]]
+	if [[ $test3 == 0 ]]
 	then
-		echo "First test (Header info exposure) was unsuccessful"
+		echo -e "\nThird test (Header info exposure) was unsuccessful"
 	else
-		echo "First test (Header info exposure) was potentially successful"
-		echo "Technologies discovered on the host:"$Header_Info
+		echo -e "\nThird test (Header info exposure) was potentially successful"
+		echo "Technologies discovered on the host via the x-powered-by header:"$Header_Info
 		found=true
 		successful_tests=$((successful_tests+1))
 	fi
 }
 
-test2-nmapscript(){
+test4-nmapscript(){
 
-	#test2 use nmap http-referer-checker script
+	#test4 use nmap http-referer-checker script
 	nmap_scan=$(nmap --script http-referer-checker.nse $host)
 
 	#NEED TO ADD A FAILSAFE ON WHETHER CONNECTION REFUSED OR NOT
 
 	#used to store wordcount
-	test2=$(echo $nmap_scan | grep "Couldn't find any cross-domain scripts" | wc -w)
+	test4=$(echo $nmap_scan | grep "Couldn't find any cross-domain scripts" | wc -w)
 
 
 	#variable will be empty if nothing was found
-	if [[ $test2 != 0 ]]
+	if [[ $test4 != 0 ]]
 	then
-		echo "Second test (nmap http-referer script) was unsuccessful"
+		echo -e "\nFourth test (nmap http-referer script) was unsuccessful"
 	else
-		echo "Second test (nmap http-referer script) was potentially successful"
+		echo -e "\nFourth test (nmap http-referer script) was potentially successful"
+		#must tidy up???
 		echo "Raw nmap script output: " $nmap_scan
 		found=true
 		successful_tests=$((successful_tests+1))
 	fi
 }
 
-test3-mention(){
+test5-mention(){
 
-	#test3 grep returned html for any mention of js (decided to miss out php since many false positives may be returned)
+	#test5 grep returned html for any mention of js (decided to miss out php since many false positives may be returned)
 
 
 	#add https to hostname before check if site is public
@@ -66,15 +93,15 @@ test3-mention(){
 	fi
 	#echo $webpage
 
-	test3=$(echo $webpage | wc -w)
+	test5=$(echo $webpage | wc -w)
 	#testing
 	#echo $test3
 
-	if [[ $test3 == 0 ]]
+	if [[ $test5 == 0 ]]
 	then
-		echo "Third test (Mention in body) was unsuccessful"
+		echo -e "\nFifth test (Mention in body) was unsuccessful"
 	else
-		echo "Third test (Mention in body) was potentially successful"
+		echo -e "\nFifth test (Mention in body) was potentially successful"
 
 		#filtered will contain every line that has src=<WILDCARD></script>
 		filtered=$(echo $webpage | grep -o -P "src=.*(?=</script>)")
@@ -83,21 +110,21 @@ test3-mention(){
 		filtered2=$(echo $filtered | sed 's/^src="//' | sed 's/">$//')
 		
 		#testing
-		echo "All instances of the mention of JavaScript on the site: " $filtered2
+		echo "All instances of the mention of JavaScript in the site's source code:" $filtered2
 		found=true
 		successful_tests=$((successful_tests+1))
 	fi
 }
 
-test4-resourceaccess() {
+test6-resourceaccess() {
 
-	#test4 attempt to read all from /resources (last resort, very unlikely to work)
+	#test6 attempt to read all from /resources (last resort, very unlikely to work)
 
 	#200 if this folder exists, 404 if not. Check before it reads contents
 	returncode=$(curl -sI $host/resources/ | grep "HTTP" | awk '{print $2}')
 	if [[ $returncode != 200 ]]
 	then
-		echo "Fourth test (/resources folder) has not identified JS version(s)"
+		echo -e "\nSixth test (/resources folder) has not identified JS version(s)"
 	else
 		resourcecontents=$(curl -s $host/resources/ )
 		#echo $resourcecontents
@@ -108,12 +135,12 @@ test4-resourceaccess() {
 		#decides whether anything with the .js extension has been found
 		if [[ $jsfiles == 0 ]]
 		then
-			echo "Fourth test (/resources folder) has not identified JS version(s)"
+			echo -e "\nSixth test (/resources folder) has not identified JS version(s)"
 		else
-			echo "Fourth test (/resources folder has potentailly identified JS version(s)"
+			echo -e "\nSixth test (/resources folder has potentailly identified JS version(s)"
 			echo "Below are all the discovered files in /resources that contain the .js extension"
 			echo $jsfiles
-			echo -e "\nOne of these may contain a clue as to JavaScript usage on the host"
+			echo -e "\nNote: it's possible none of these may contain a clue as to JavaScript usage"
 			found=true
 			successful_tests=$((successful_tests+1))
 		fi
@@ -121,7 +148,7 @@ test4-resourceaccess() {
 
 }
 
-test5-wappalyzer(){
+test7-wappalyzer(){
 
 	#this 'hidden' test will use the wappalyzer api as a last resort to try and find any js libraries and version used
 	#since this is a public service it will only work on public domains. 
@@ -136,11 +163,12 @@ test5-wappalyzer(){
 	#and only print the output if the test was successful
 	if echo $wappresults | grep -q "Invalid"
 	then
-		echo "Fifth test (Wappalyzer) has not been able to identify JavaScript version(s)"
+		echo -e "\nSeventh test (Wappalyzer) was unsuccessful"
 	else
 		#read the raw output from the API into an array seperated by commas
 		IFS=',' read -ra wapparray <<< $wappresults
 		#prints the array. Must find a way to clean this up
+		echo -e "\nSeventh test (Wappalyzer) was potentially successful"
 		echo "Raw Wappalyzer output: " ${warrarray[@]}
 		found=true
 		successful_tests=$((successful_tests+1))
@@ -158,28 +186,3 @@ test5-wappalyzer(){
 
 }
 
-test6-phpinfo(){
-	 #this test will use curl to check the response to access attempts for phpinfo in its default location
-
-	 php_returncode=$(curl -sI $host/phpinfo.php | grep "HTTP" | awk '{print $2}')
-	 echo $php_returncode
-	 if [[ $php_returncode != 302 ]]
-	 then
-	 	echo "PHP info page not discovered on host. This could be for several reasons"
-	 else
-	 	echo "PHP info page discovered on host at /phpinfo.php. This will show PHP configuration on the host"
-	 fi
-}
-
-test7-phpmyadmin(){
-	 #this test will use curl to check the response to access attempts for phpmyadmin in its default location
-
-	 myadmin_returncode=$(curl -sI $host/phpmyadmin | grep "HTTP" | awk '{print $2}')
-	 echo $php_returncode
-	 if [[ $php_returncode != 302 ]]
-	 then
-	 	echo "phpmyadmin not discovered on host. This could be for several reasons"
-	 else
-	 	echo "phpmyadmin discovered on host at /phpmyadmin. This is a dashboard for developers and should really be hidden"
-	 fi
-}

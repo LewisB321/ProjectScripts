@@ -55,11 +55,13 @@ echo -e "\nBeginning the identification of supported Javascript/PHP version(s). 
 
 found=false
 successful_tests=0
-test1-xpoweredby
-test2-nmapscript
-test3-mention
+test1-phpinfo
+test2-phpmyadmin
+test3-xpoweredby
+test4-nmapscript
+test5-mention
 #not playing nice currently
-#test4-resourceaccess
+#test6-resourceaccess
 
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
@@ -67,7 +69,7 @@ test3-mention
 #then
 	#if [[ $publicsite == "y" ]]
 	#then
-		#test5-wappalyzer
+		#test7-wappalyzer
 	#else
 		#false
 	#fi
@@ -77,15 +79,28 @@ test3-mention
 
 if [[ $found == false ]]
 then
-	echo -e "\nSupported JavaScript version(s)/libraries unable to be discovered"
+	echo -e "\nCould not find any information on JS/PHP techlogies used"
 else
 	echo -e "\nThere were $successful_tests successful tests for JS/PHP"
 fi
 
 echo -e "\nNow probing target to determine TLS ciphersuite"
 
-#enum_ciphers is not playing nice in the main script due to a different output from nmap messing up the rest of the function. MUST FIX!!!!
-#enum_ciphers
+#the below code will make a curl request to see if host responds to https requests. Will be empty
+#if https is unavailable, meaning the ciphersuite analysis will be bypassed
+#could do this using openssl -connect but this achieves the same goal
+httpscheck=$(curl -s https://$host)
+httpscheck_wc=$(echo $httpscheck | wc -w)
+
+#enum_ciphers isn't playing nice within the main script. Must fix!!!!
+if [[ $httpscheck_wc == 0 ]]
+then
+	echo "Host is unsuitable for ciphersuite analysis (cannot be contacted on port 443)"
+else
+	echo "Host is suitable for ciphersuite analysis"
+	#Not playing nice in the main script due to a different output from nmap messing up the rest of the function. MUST FIX!!!!
+	#enum_ciphers
+fi
 
 read -p "Would you like to output this summary to a text file? (Y/N)" output
 
