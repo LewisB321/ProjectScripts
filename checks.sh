@@ -54,10 +54,12 @@ httpmethods
 echo -e "\nBeginning the identification of supported Javascript/PHP version(s). This may take a while"
 
 found=false
+successful_tests=0
 test1-xpoweredby
 test2-nmapscript
 test3-mention
-test4-resourceaccess
+#not playing nice currently
+#test4-resourceaccess
 
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
@@ -77,7 +79,7 @@ if [[ $found == false ]]
 then
 	echo -e "\nSupported JavaScript version(s)/libraries unable to be discovered"
 else
-	echo -e "\nFound JavaScript placeholder"
+	echo -e "\nThere were $successful_tests successful tests for JS/PHP"
 fi
 
 echo -e "\nNow probing target to determine TLS ciphersuite"
