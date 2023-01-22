@@ -109,7 +109,6 @@ test5-mention(){
 		#filtered2 will further develop this output to remove uneccesary characters using sed
 		filtered2=$(echo $filtered | sed 's/^src="//' | sed 's/">$//')
 		
-		#testing
 		echo "All instances of the mention of JavaScript in the site's source code:" $filtered2
 		found=true
 		successful_tests=$((successful_tests+1))

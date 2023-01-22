@@ -2,8 +2,8 @@
 
 httpmethods(){
 	#curl request to grab supported http methods
-	methods=$(curl -sI -X OPTIONS 10.0.19.58 | grep "Allow" | awk '{print $2}')
-
+	methods=$(curl -sI -X OPTIONS $host | grep "Allow:" |awk '{$1=""}1')
+	methods_wc=$(echo $methods | wc -w)
 	#testing
 	#echo $methods
 
@@ -23,7 +23,7 @@ httpmethods(){
 		[[ "PATCH" == $httpmethod ]] && ((unsecuremethodcounter=unsecuremethodcounter+1))
 	done
 
-	echo -e "\nThe supported http methods on the host are as follows:" ${MethodsArray[@]}
+	
 
 	#final check whether unsecure methods are present
 	if [[ $unsecuremethodcounter != 0 ]]
@@ -31,6 +31,18 @@ httpmethods(){
 		echo "There are $unsecuremethodcounter unsecure http methods supported by the host"
 		echo -e "\nFor more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods" #will add more info later
 	else
-		echo "No unsecure http methods discovered"
+		if [[ $methods_wc == 0 ]]
+		then
+			echo "No http methods could be identified"
+		else
+			echo -e "\nThe supported http methods on the host are as follows:" ${MethodsArray[@]}
+			if [[ $unsecuremethodcounter != 0 ]]
+			then
+				echo "There are $unsecuremethodcounter unsecure http methods supported by the host"
+				echo -e "\nFor more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods" #will add more info later
+			else
+				echo "No unsecure http methods discovered"
+			fi
+		fi
 	fi
 }
