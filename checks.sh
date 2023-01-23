@@ -60,8 +60,7 @@ test2-phpmyadmin
 test3-xpoweredby
 test4-nmapscript
 test5-mention
-#not playing nice currently
-#test6-resourceaccess
+test6-resourceaccess
 
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
@@ -98,7 +97,6 @@ then
 	echo "Host is unsuitable for ciphersuite analysis (cannot be contacted on port 443)"
 else
 	echo "Host is suitable for ciphersuite analysis"
-	#Not playing nice in the main script due to a different output from nmap messing up the rest of the function. MUST FIX!!!!
 	#enum_ciphers
 fi
 
@@ -107,11 +105,36 @@ read -p "Would you like to output this summary to a text file? (Y/N)" output
 if [[ $output == 'y' ]]
 then
 	echo "Outputting information to text file remote-host-summary.txt"
-	touch remote-host-summary.txt
+
 	#Web server output
-	echo "Webserver: "$version >> remote-host-summary.txt
+	if [[ $identified != 1 ]]
+	then
+		echo "Webserver could not be identified on" $host
+	else
+		echo "Webserver: "$version > remote-host-summary.txt
+		if [[ $webservlatest == false ]]
+		then
+			echo "New webserver version available for download" >> remote-host-summary.txt
+		else
+			echo "Latest webserver version detected" >> remote-host-summary.txt
+		fi
+	fi
+
 	#http methods output
-	echo "Methods: "$methods >> remote-host-summary.txt 
+	if [[ $methods_wc == 0 ]]
+	then
+		echo -e "\nhttp methods could not be identified on" $host
+	else
+		echo -e "\nMethods:"$methods >> remote-host-summary.txt 
+		if [[ $unsecuremethodcounter == 0 ]]
+		then
+			echo "No dangerous http methods identified" >> remote-host-summary.txt
+		else
+			echo $unsecuremethodcounter "Unsecure http methods found on host" >> remote-host-summary.txt
+			echo "Please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods for further information" >. remote-host-summary.txt
+		fi	
+	fi
+
 	#js version(s) output
 	echo "Placeholder for JS" >> remote-host-summary.txt
 	#ciphersuite analysis output

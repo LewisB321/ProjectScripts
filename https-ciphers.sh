@@ -16,11 +16,11 @@ echo_results() {
 	C_count=$(echo $full_list | grep '\sC' | wc -l)
 	D_count=$(echo $full_list | grep '\sD' | wc -l)
 	E_count=$(echo $full_list | grep '\sE' | wc -l)
-	#F_count=$(echo $full_list | grep '\sF' | wc -l)
+	F_count=$(echo $full_list | grep '\sF' | wc -l)
 	
 	#setting up 2 arrays for the next nested loop
-	grade_array=('A' 'B' 'C' 'D' 'E')
-	count_array=($A_count $B_count $C_count $D_count $E_count)
+	grade_array=('A' 'B' 'C' 'D' 'E' 'F' 'PLACEHOLDER')
+	count_array=($A_count $B_count $C_count $D_count $E_count $F_count 'PLACEHOLDER')
 	len1=${#grade_array[@]}
 	len2=${#count_array[@]}
 

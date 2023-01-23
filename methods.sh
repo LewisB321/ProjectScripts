@@ -26,23 +26,17 @@ httpmethods(){
 	
 
 	#final check whether unsecure methods are present
-	if [[ $unsecuremethodcounter != 0 ]]
+	if [[ $methods_wc == 0 ]]
 	then
-		echo "There are $unsecuremethodcounter unsecure http methods supported by the host"
-		echo -e "\nFor more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods" #will add more info later
+		echo "No http methods could be identified"
 	else
-		if [[ $methods_wc == 0 ]]
+		echo -e "\nThe supported http methods on the host are as follows:" ${MethodsArray[@]}
+		if [[ $unsecuremethodcounter != 0 ]]
 		then
-			echo "No http methods could be identified"
+			echo "There are $unsecuremethodcounter unsecure http methods supported by the host"
+			echo -e "\nFor more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods" #will add more info later
 		else
-			echo -e "\nThe supported http methods on the host are as follows:" ${MethodsArray[@]}
-			if [[ $unsecuremethodcounter != 0 ]]
-			then
-				echo "There are $unsecuremethodcounter unsecure http methods supported by the host"
-				echo -e "\nFor more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods" #will add more info later
-			else
-				echo "No unsecure http methods discovered"
-			fi
+			echo "No unsecure http methods discovered"
 		fi
 	fi
 }

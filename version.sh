@@ -15,6 +15,7 @@ isapache=false
 isnginx=false
 isgunicorn=false
 hasversion=false
+webservlatest=false
 
 #2 tests to determine Apache & nginx instances. If discovered, a flag is set to true for later
 test_for_apache=$(echo $version | grep -o "Apache" | wc -w)
@@ -97,6 +98,7 @@ apache_ver_check() {
 	if [[ $version == $latest_version_apache ]]
 	then
 		echo "Latest Apache version identified"
+		webservlatest=true
 	else
 		echo "Latest Apache version:" $latest_version_apache
 		echo -e "\nNew Apache version available for download. Please visit httpd.apache.org/download.cgi for more information"
@@ -108,6 +110,7 @@ nginx_ver_check() {
 	if [[ $version == $latest_version_nginx ]]
 	then
 		echo "Latest nginx version identified"
+		webservlatest=true
 	else
 		echo "Latest nginx version:" $latest_version_nginx
 		echo -e "\nNew nginx version available for download. Please visit www.nginx.org/en/download.html for more information"
@@ -119,6 +122,7 @@ gunicorn_ver_check() {
 	if [[ $version == $latest_version_gunicorn ]]
 	then
 		echo "Latest gunicorn version identified"
+		webservlatest=true
 	else
 		echo "Latest gunicorn version:" $latest_version_gunicorn
 		echo -e "\nNew gunicorn version available for download. Please visit www.pypi.org/projects/gunicorn for more information"

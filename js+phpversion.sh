@@ -59,8 +59,6 @@ test4-nmapscript(){
 	#test4 use nmap http-referer-checker script
 	nmap_scan=$(nmap --script http-referer-checker.nse $host)
 
-	#NEED TO ADD A FAILSAFE ON WHETHER CONNECTION REFUSED OR NOT
-
 	#used to store wordcount
 	test4=$(echo $nmap_scan | grep "Couldn't find any cross-domain scripts" | wc -w)
 
@@ -125,11 +123,10 @@ test6-resourceaccess() {
 	then
 		echo -e "\nSixth test (/resources folder) has not identified JS version(s)"
 	else
-		resourcecontents=$(curl -s $host/resources/ )
-		#echo $resourcecontents
+		curl -s -o test6.txt $host/resources/ 
 
 		#the following uses grep to grab the search criteria, .js file, and then sed to refine the output
-		jsfiles=$(echo $resourcecontents | grep -o -P 'href.*.js(?=">)' | sed 's/href="//')
+		jsfiles=$(cat test6.txt | grep -o -P 'href.*.js(?=">)' | sed 's/href="//')
 		
 		#decides whether anything with the .js extension has been found
 		if [[ $jsfiles == 0 ]]
