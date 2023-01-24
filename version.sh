@@ -2,7 +2,7 @@
 
 webservercheck(){
 	#hardcoded latest Apache version. Not familiar with how to parse the html content from Apache's website
-latest_version_apache="Apache/2.4.54"
+latest_version_apache="Apache/2.4.55"
 latest_version_nginx="nginx/1.23.3"
 latest_version_gunicorn="gunicorn/20.1.0"
 

@@ -6,12 +6,14 @@ source js+phpversion.sh
 source https-ciphers.sh
 
 #flag for specifying the host (can be IP or domain)
-while getopts h:p:f:o: flag
+while getopts h:p:f:w: flag
 do
 	case "${flag}" in
 		h) host=${OPTARG};;
 		p) publicsite=${OPTARG};;
 		f) force=${OPTARG};;
+		w) wapp=${OPTARG};;
+
 	esac
 done
 
@@ -53,6 +55,7 @@ httpmethods
 
 echo -e "\nBeginning the identification of supported Javascript/PHP version(s). This may take a while"
 
+#these 2 flags will be used during text file output
 found=false
 successful_tests=0
 test1-phpinfo
@@ -64,17 +67,17 @@ test6-resourceaccess
 
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
-#if echo $* | grep -e "-p" -q
-#then
-	#if [[ $publicsite == "y" ]]
-	#then
-		#test7-wappalyzer
-	#else
-		#false
-	#fi
-#else
-	#false
-#fi
+if echo $* | grep -e "-w" -q
+then
+	if [[ $wapp == "y" ]]
+	then
+		test7-wappalyzer
+	else
+		false
+	fi
+else
+	false
+fi
 
 if [[ $found == false ]]
 then
@@ -97,7 +100,7 @@ then
 	echo "Host is unsuitable for ciphersuite analysis (cannot be contacted on port 443)"
 else
 	echo "Host is suitable for ciphersuite analysis"
-	#enum_ciphers
+	enum_ciphers
 fi
 
 read -p "Would you like to output this summary to a text file? (Y/N)" output

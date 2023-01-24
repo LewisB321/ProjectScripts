@@ -5,11 +5,12 @@ test1-phpinfo(){
 
 	 php_returncode=$(curl -sI $host/phpinfo.php | grep "HTTP" | awk '{print $2}')
 	 #echo $php_returncode
-	 if [[ $php_returncode != 302 ]]
+	 if [[ $php_returncode == 200 ]]
 	 then
-	 	echo -e "\nFirst test (phpinfo.php) was unsuccessful"
-	 else
+	 	
 	 	echo -e "\nFirst test (phpinfo.php) was potentially successful. Host is advertising php info at {host}/phpinfo.php"
+	 else
+	 	echo -e "\nFirst test (phpinfo.php) was unsuccessful"
 	 fi
 }
 
