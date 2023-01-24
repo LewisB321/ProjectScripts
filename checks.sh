@@ -2,10 +2,11 @@
 
 source version.sh
 source methods.sh
-source js+phpversion.sh
+source jschecks.sh
+source phpchecks.sh
 source https-ciphers.sh
 
-#flag for specifying the host (can be IP or domain)
+#flags to alter script behaviour
 while getopts h:p:f:w: flag
 do
 	case "${flag}" in
@@ -53,17 +54,27 @@ echo -e "\nBeginning test for supported http methods on the host"
 
 httpmethods
 
-echo -e "\nBeginning the identification of supported Javascript/PHP version(s). This may take a while"
+#these flags will be used during text file output later
+found_php=false
+found_js=false
+found_asp=false
+successful_tests_php=0
+successful_tests_js=0
+successful_tests_asp=0
 
-#these 2 flags will be used during text file output
-found=false
-successful_tests=0
-test1-phpinfo
-test2-phpmyadmin
-test3-xpoweredby
-test4-nmapscript
-test5-mention
-test6-resourceaccess
+#####PHP#######
+echo -e "\nNow beginning php enumeration"
+phpinfo
+phpmyadmin
+##############
+
+##########JS###########
+echo -e "\nNow beginning js enumeration"
+xpoweredby
+nmapscript_referer
+mention
+resourceaccess
+#######################
 
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
@@ -71,7 +82,7 @@ if echo $* | grep -e "-w" -q
 then
 	if [[ $wapp == "y" ]]
 	then
-		test7-wappalyzer
+		wappalyzer
 	else
 		false
 	fi
@@ -79,6 +90,7 @@ else
 	false
 fi
 
+############################################################################################################################################################
 if [[ $found == false ]]
 then
 	echo -e "\nCould not find any information on JS/PHP techlogies used"
@@ -87,6 +99,10 @@ else
 fi
 
 echo -e "\nNow probing target to determine TLS ciphersuite"
+##############################################################################################################################################################
+
+
+
 
 #the below code will make a curl request to see if host responds to https requests. Will be empty
 #if https is unavailable, meaning the ciphersuite analysis will be bypassed
@@ -145,8 +161,3 @@ then
 else
 	false
 fi
-
-
-
-
-
