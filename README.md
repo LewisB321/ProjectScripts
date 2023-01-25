@@ -25,3 +25,5 @@ TEST3 - MULTIPLE SUBTESTS FOR JS/PHP. Still a work in progress, especially makin
 
 
 TEST4 - ENCRYPTION. Still doesn't play nice in the main script so you'll have to run it individually :-(
+
+TWITTER IS AN ASSHOLE SITE SO IT OMITS WWW OR THE TESTS DON'T WORK >:(
