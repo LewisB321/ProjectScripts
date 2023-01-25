@@ -5,6 +5,9 @@ source methods.sh
 source jschecks.sh
 source phpchecks.sh
 source https-ciphers.sh
+source xpoweredby.sh
+source resourceaccess.sh
+source mention.sh
 
 #flags to alter script behaviour
 while getopts h:p:f:w: flag
@@ -62,18 +65,20 @@ successful_tests_php=0
 successful_tests_js=0
 successful_tests_asp=0
 
+######MULTIPLE######
+echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or libraries 3) JS version(s) or libraries"
+xpoweredby
+resourceaccess
+####################
+
 #####PHP#######
-echo -e "\nNow beginning php enumeration"
 phpinfo
 phpmyadmin
 ##############
 
 ##########JS###########
-echo -e "\nNow beginning js enumeration"
-xpoweredby
 nmapscript_referer
 mention
-resourceaccess
 #######################
 
 #optional test which depends on whether the site is publicly available or not
@@ -90,19 +95,7 @@ else
 	false
 fi
 
-############################################################################################################################################################
-if [[ $found == false ]]
-then
-	echo -e "\nCould not find any information on JS/PHP techlogies used"
-else
-	echo -e "\nThere were $successful_tests successful tests for JS/PHP"
-fi
-
 echo -e "\nNow probing target to determine TLS ciphersuite"
-##############################################################################################################################################################
-
-
-
 
 #the below code will make a curl request to see if host responds to https requests. Will be empty
 #if https is unavailable, meaning the ciphersuite analysis will be bypassed
