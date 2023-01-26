@@ -79,6 +79,7 @@ phpmyadmin
 ##########JS###########
 nmapscript_referer
 mention
+jsfolderaccess
 #######################
 
 #optional test which depends on whether the site is publicly available or not

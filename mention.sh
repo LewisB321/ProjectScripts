@@ -36,8 +36,8 @@ mention_JavaScript(){
 
 	mention_js=$(echo $webpage | grep -i 'script type="text/javascript"')
 	mention_js_wc=$(echo $mention_js | wc -w)
-
-	if [[ mention_js_wc == 0 ]]
+	#echo $mention_js
+	if [[ $mention_js_wc == 0 ]]
 	then
 		echo "No mention of JavaScript in source code"
 		return 0
@@ -76,6 +76,7 @@ mention_asp(){
 	#these 2 strings are often hidden and used by asp. Presence of these indicates ASP is being used
 	echo "__VIEWSTATE" > mention_asp.txt
 	echo "__EVENTVALIDATION" >> mention_asp.txt
+	echo "ASP.NET" >> mention_asp.txt
 
 	mention_asp=$(echo $webpage | grep -i -f mention_asp.txt)
 	mention_asp_wc=$(echo $mention_asp | wc -w)
