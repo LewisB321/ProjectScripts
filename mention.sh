@@ -21,6 +21,7 @@ mention(){
 		echo "Could not read host's source code"
 		return 0
 	else
+		echo -e "\n"
 		mention_JavaScript
 		mention_asp
 	fi

@@ -66,7 +66,7 @@ successful_tests_js=0
 successful_tests_asp=0
 
 ######MULTIPLE######
-echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or libraries 3) JS version(s) or libraries"
+echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries"
 xpoweredby
 resourceaccess
 ####################
@@ -80,8 +80,6 @@ phpmyadmin
 nmapscript_referer
 mention
 jsfolderaccess
-#######################
-
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
 if echo $* | grep -e "-w" -q
@@ -95,6 +93,9 @@ then
 else
 	false
 fi
+#######################
+
+
 
 echo -e "\nNow probing target to determine TLS ciphersuite"
 

@@ -60,7 +60,7 @@ echo_results() {
 	C_count=$(cat nmapoutput.txt | grep '\sC' | wc -l)
 	D_count=$(cat nmapoutput.txt | grep '\sD' | wc -l)
 	E_count=$(cat nmapoutput.txt | grep '\sE' | wc -l)
-	F_count=$(cat nmapoutput.txt | grep '\sF' | wc -l)
+	F_count=$(cat nmapoutput.txt | grep '\sF\s' | wc -l) #Have to explictly do this otherwise it picks up 'Friday'
 	
 	#setting up 2 arrays for the next nested loop
 	grade_array=('A' 'B' 'C' 'D' 'E' 'F')
@@ -70,9 +70,9 @@ echo_results() {
 
 	#this awkward bit of syntax will iterate through both arrays (I know they're the same length) and then
 	#provide an output as to how many instances each algorithm grade has
-	for ((i=0;i<$len1;i++))
+	for ((i=0;i<=$len1;i++))
 	do
-		for ((j=0;j<$len2;j++))
+		for ((j=0;j<=$len2;j++))
 		do
 			if [ $i -eq $j ]
 			then
