@@ -72,6 +72,44 @@ mention_JavaScript(){
 	#echo ${js_array_refined[@]}
 }
 
+mention_php(){
+
+	mention_php=$(echo $webpage | grep -i 'php')
+	mention_php_wc=$(echo $mention_php | wc -w)
+	#echo $mention_php
+	if [[ $mention_php_wc == 0 ]]
+	then
+		echo "No mention of PHP in source code"
+		return 0
+	else
+		false
+	fi
+
+	#php_filtered will contain every line that has src=<WILDCARD></script>
+	php_filtered=$(echo $webpage | grep -o -P "src=.*(?=</script>)")
+
+	#array to add every JS element
+	js_array_refined=()
+
+	#Will take the raw output, put it into array and parse the array for matches
+	#Upon a match, it will be placed inside it's own array for usage later
+	IFS=' ' read -A js_array <<< $js_filtered
+	echo "Every trace of JavaScript found in the host's source code:"
+	for element in ${js_array[@]}
+	do
+		if echo $element | grep -q ".js" #if element contains the substring .js
+		then
+			#get the output but remove unecessary characters
+			add_to_array=$(echo $element | sed 's/^src="//' | sed 's#"></script><script$##')
+			echo $add_to_array
+			js_array_refined+=($add_to_array)
+		else
+			false
+		fi
+	done
+
+	#echo ${js_array_refined[@]}
+}
 mention_asp(){
 
 	#these 2 strings are often hidden and used by asp. Presence of these indicates ASP is being used
