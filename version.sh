@@ -5,19 +5,28 @@ webservercheck(){
 latest_version_apache="Apache/2.4.55"
 latest_version_nginx="nginx/1.23.3"
 latest_version_gunicorn="gunicorn/20.1.0"
+latest_version_iis="Microsoft-IIS/10.0"
 
 #curl request to check web server version and make a wordcount for a later check
-version=$(curl -sI $host | grep "Server" | awk '{print $2}')
+
+if [[ $publicsite == 'y' ]]
+	then
+			version=$(curl -sI https://"$host" | grep "Server" | awk '{print $2}')
+	else
+			version=$(curl -sI http://"$host" | grep "Server" | awk '{print $2}')
+	fi
+
 version_wc=$(echo $version | wc -w)
 #extra variable for use later in determining if the server is Apache. The reason for this is that Apache is the
 #only commonly used host that advertises it's version number in the header
 isapache=false
 isnginx=false
 isgunicorn=false
+isiis=false
 hasversion=false
 webservlatest=false
 
-#2 tests to determine Apache & nginx instances. If discovered, a flag is set to true for later
+#tests to determine different webserver software
 test_for_apache=$(echo $version | grep -o "Apache" | wc -w)
 if [[ $test_for_apache == 1 ]]
 then
@@ -41,6 +50,15 @@ then
 else
 	false
 fi
+
+test_for_iis=$(echo $version | grep -o "IIS" | wc -w)
+if [[ $test_for_iis == 1 ]]
+then
+	isiis=true
+else
+	false
+fi
+
 
 #check whether anything in variable i.e. whether anything at all has been grepped
 identified=$(echo $version | wc -w)
@@ -70,6 +88,8 @@ fi
 #final comparison if version number has been identified. A check is ran based on earlier flags and a comparison is made based on the correct software
 if [[ $hasversion == true ]]
 then
+	#charcount is used because I needed to remove the newline character from $version in order to compare it to the hardcoded latest version that I have
+	charcount_1=$(echo -n $version | wc -c)
 	if [[ $isapache == true ]]
 	then
 		apache_ver_check
@@ -88,6 +108,12 @@ then
 	else
 		false
 	fi
+	if [[ $isiis == true ]]
+	then
+		iis_ver_check
+	else
+		false
+	fi
 else
 	return 0
 fi
@@ -95,7 +121,8 @@ fi
 
 #placed the check code inside of their own functions to help with scalability if necessary
 apache_ver_check() {
-	if [[ $version == $latest_version_apache ]]
+	charcount_apache=$(echo $latest_version_apache | wc -c)
+	if [[ $charcount_1 == $charcount_apache ]]
 	then
 		echo "Latest Apache version identified"
 		webservlatest=true
@@ -107,7 +134,8 @@ apache_ver_check() {
 }
 
 nginx_ver_check() {
-	if [[ $version == $latest_version_nginx ]]
+	charcount_nginx=$(echo $latest_version_nginx | wc -c)
+	if [[ $charcount_1 == $charcount_nginx ]]
 	then
 		echo "Latest nginx version identified"
 		webservlatest=true
@@ -119,13 +147,27 @@ nginx_ver_check() {
 }
 
 gunicorn_ver_check() {
-	if [[ $version == $latest_version_gunicorn ]]
+	charcount_gun=$(echo $latest_version_gunicorn | wc -c)
+	if [[ $charcount_1 == $charcount_gun ]]
 	then
 		echo "Latest gunicorn version identified"
 		webservlatest=true
 	else
 		echo "Latest gunicorn version:" $latest_version_gunicorn
 		echo -e "\nNew gunicorn version available for download. Please visit www.pypi.org/projects/gunicorn for more information"
+		echo "Running an old web server version may leave the instance succeptible to disclosed vulnerabilities but it is not always the best option either. Please think carefully before (not) upgrading your instance"
+	fi
+}
+
+iis_ver_check() {
+	charcount_iis=$(echo $latest_version_iis | wc -c)
+	if [[ $charcount_1 == $charcount_iis ]]
+	then
+		echo "Latest IIS version identified"
+		webservlatest=true
+	else
+		echo "Latest IIS version:" $latest_version_iis
+		echo -e "\nNew IIS version available for download. Please visit iis.net/downloads for more information"
 		echo "Running an old web server version may leave the instance succeptible to disclosed vulnerabilities but it is not always the best option either. Please think carefully before (not) upgrading your instance"
 	fi
 }
