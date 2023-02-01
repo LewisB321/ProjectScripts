@@ -3,7 +3,7 @@
 nmapscript_referer(){
 
 	#Use nmap http-referer-checker script
-	nmap_scan=$(nmap --script http-referer-checker.nse $host)
+	nmap_scan=$(nmap -p80,443 --script http-referer-checker.nse $host)
 
 	#used to store wordcount
 	test_nmap=$(echo $nmap_scan | grep "Couldn't find any cross-domain scripts" | wc -w)
@@ -27,7 +27,7 @@ jsfolderaccess() {
 	#Attempt to read all from /js
 
 	#200 if this folder exists, 404 if not. Check before it reads contents
-	returncode=$(curl -sI $host/js/ | grep "HTTP" | awk '{print $2}')
+	returncode=$(curl -sI https://$host/js/ | grep "HTTP" | awk '{print $2}')
 	if [[ $returncode != 200 ]]
 	then
 		echo -e "\nJS folder not present"

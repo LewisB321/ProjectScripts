@@ -36,7 +36,7 @@ aspcheck(){
 	asp_extra_check_wc=$(echo $asp_extra_check | wc -w)
 	if [[ $asp_check_wc == 0 ]]
 	then
-		false
+		echo "ASP.NET undiscovered by xpb"
 	else
 		if [[ $asp_extra_check_wc == 0 ]]
 		then
