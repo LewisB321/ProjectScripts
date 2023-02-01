@@ -69,6 +69,7 @@ successful_tests_asp=0
 echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries"
 xpoweredby
 resourceaccess
+#mention DOESN'T WORK!!!!!
 ####################
 
 #####PHP#######
@@ -78,7 +79,6 @@ phpmyadmin
 
 ##########JS###########
 nmapscript_referer
-mention
 jsfolderaccess
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way

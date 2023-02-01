@@ -23,6 +23,7 @@ mention(){
 	else
 		echo -e "\n"
 		mention_JavaScript
+		mention_php
 		mention_asp
 	fi
 	
@@ -43,7 +44,7 @@ mention_JavaScript(){
 		echo "No mention of JavaScript in source code"
 		return 0
 	else
-		false
+		found_js=true
 	fi
 
 	#js_filtered will contain every line that has src=<WILDCARD></script>
@@ -54,7 +55,7 @@ mention_JavaScript(){
 
 	#Will take the raw output, put it into array and parse the array for matches
 	#Upon a match, it will be placed inside it's own array for usage later
-	IFS=' ' read -A js_array <<< $js_filtered
+	IFS=' ' read -a js_array <<< $js_filtered
 	echo "Every trace of JavaScript found in the host's source code:"
 	for element in ${js_array[@]}
 	do
@@ -74,7 +75,7 @@ mention_JavaScript(){
 
 mention_php(){
 
-	mention_php=$(echo $webpage | grep -i 'php')
+	mention_php=$(echo $webpage | grep -i '.php')
 	mention_php_wc=$(echo $mention_php | wc -w)
 	#echo $mention_php
 	if [[ $mention_php_wc == 0 ]]
@@ -82,33 +83,23 @@ mention_php(){
 		echo "No mention of PHP in source code"
 		return 0
 	else
-		false
+		found_php=true
 	fi
 
-	#php_filtered will contain every line that has src=<WILDCARD></script>
-	php_filtered=$(echo $webpage | grep -o -P "src=.*(?=</script>)")
-
-	#array to add every JS element
-	js_array_refined=()
+	#php_filtered will contain every instance of a string with the .php file extension
+	php_filtered=$(echo $webpage | grep -o "\S*.php")
+	echo $php_filtered
 
 	#Will take the raw output, put it into array and parse the array for matches
 	#Upon a match, it will be placed inside it's own array for usage later
-	IFS=' ' read -A js_array <<< $js_filtered
-	echo "Every trace of JavaScript found in the host's source code:"
-	for element in ${js_array[@]}
-	do
-		if echo $element | grep -q ".js" #if element contains the substring .js
-		then
-			#get the output but remove unecessary characters
-			add_to_array=$(echo $element | sed 's/^src="//' | sed 's#"></script><script$##')
-			echo $add_to_array
-			js_array_refined+=($add_to_array)
-		else
-			false
-		fi
-	done
+	#IFS=' ' read -a php_array <<< $php_filtered
+	#echo "Every trace of PHP found in the host's source code:"
+	#for element in ${php_array[@]}
+	#do
+		#echo $element
+	#done
 
-	#echo ${js_array_refined[@]}
+	
 }
 mention_asp(){
 
