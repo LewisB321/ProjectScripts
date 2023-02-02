@@ -8,9 +8,9 @@ resourceaccess() {
 	#200 if this folder exists, 404 if not. Check before it reads contents
 	if [[ $publicsite == "y" ]]
 	then
-		returncode=$(curl -sI https://$host/resources/ | grep "HTTP" | awk '{print $2}')
+		returncode=$(curl -sI -L https://$host/resources/ | grep "HTTP" | awk '{print $2}')
 	else
-		returncode=$(curl -sI $host/resources/ | grep "HTTP" | awk '{print $2}')
+		returncode=$(curl -sI -L $host/resources/ | grep "HTTP" | awk '{print $2}')
 	fi
 	if [[ $returncode != 200 ]]
 	then

@@ -41,7 +41,19 @@ jsfolderaccess() {
 		else
 			echo -e "\nJS identified in the JS folder"
 			echo "Below are all the discovered files in /js that contain the .js extension"
-			echo $jsfolderfiles
+			IFS=' ' read -a allfiles <<< $jsfolderfiles
+			for element in ${allfiles[@]}
+			do
+				echo $element
+			done
+
+
+
+
+
+
+			#echo ${allfiles[@]}
+			#echo $jsfolderfiles
 			echo -e "\nNote: These are only the scripts used on the host, they may not contain any indication of vulnerability or version number(s)"
 			found_js=true
 		fi

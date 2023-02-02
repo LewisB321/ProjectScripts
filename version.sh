@@ -1,30 +1,31 @@
 #! /bin/bash
 
 webservercheck(){
-	#hardcoded latest Apache version. Not familiar with how to parse the html content from Apache's website
+#hardcoded latest versions. Can't really find an accurate way of scraping this so it'll have to do
 latest_version_apache="Apache/2.4.55"
 latest_version_nginx="nginx/1.23.3"
 latest_version_gunicorn="gunicorn/20.1.0"
 latest_version_iis="Microsoft-IIS/10.0"
 
-#curl request to check web server version and make a wordcount for a later check
-
+#standard public check
 if [[ $publicsite == 'y' ]]
-	then
-			version=$(curl -sI https://"$host" | grep "Server" | awk '{print $2}')
-	else
-			version=$(curl -sI http://"$host" | grep "Server" | awk '{print $2}')
-	fi
+then
+	version=$(curl -sI https://"$host" | grep -i "Server" | awk '{print $2}')
+else
+	version=$(curl -sI http://"$host" | grep -i "Server" | awk '{print $2}')
+fi
 
+#wordcount for later use
 version_wc=$(echo $version | wc -w)
-#extra variable for use later in determining if the server is Apache. The reason for this is that Apache is the
-#only commonly used host that advertises it's version number in the header
+
+#flags for later use
 isapache=false
 isnginx=false
 isgunicorn=false
 isiis=false
 hasversion=false
 webservlatest=false
+
 
 #tests to determine different webserver software
 test_for_apache=$(echo $version | grep -o "Apache" | wc -w)
@@ -63,7 +64,7 @@ fi
 #check whether anything in variable i.e. whether anything at all has been grepped
 identified=$(echo $version | wc -w)
 
-#will output web server version if it's been found and contingency if not
+#will output web server version if it's been found
 if [[ $identified != 1 ]]
 then
 	echo "Web server could not be identified"
@@ -71,7 +72,7 @@ else
 	echo "The web server detected on the host is:" $version
 fi
 
-#check to see whether numbers are present i.e. a version number is present
+#check to see whether numbers are present i.e. a version number 
 if [[ $version =~ [0-9] ]]
 then
 	hasversion=true

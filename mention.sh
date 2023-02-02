@@ -8,9 +8,9 @@ mention(){
 	#add https to hostname before check if site is public
 	if [[ $publicsite == 'y' ]]
 	then
-		webpage=$(curl -s https://"$host")
+		webpage=$(curl -s -L https://"$host")
 	else
-		webpage=$(curl -s $host)
+		webpage=$(curl -s -L $host)
 	fi
 	#echo $webpage
 
@@ -23,8 +23,8 @@ mention(){
 	else
 		echo -e "\n"
 		mention_JavaScript
-		mention_php
-		mention_asp
+		#mention_php
+		#mention_asp
 	fi
 	
 		

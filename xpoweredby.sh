@@ -5,11 +5,11 @@ xpoweredby(){
 	#Try to retrieve x-powered-by header information. Conditional statement for whether https should be tried
 	if [[ $publicsite == 'y' ]]
 	then
-		Header_Data=$(curl -sI https://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
-		asp_extra_check=$(curl -sI https://"$host" | grep -i "x-aspnet" | awk '{$1=""}1')
+		Header_Data=$(curl -sI -L https://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
+		asp_extra_check=$(curl -sI -L https://"$host" | grep -i "x-aspnet" | awk '{$1=""}1')
 	else
-		Header_Data=$(curl -sI http://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
-		asp_extra_check=$(curl -sI http://"$host" | grep -i "x-aspnet" | awk '{$1=""}1')
+		Header_Data=$(curl -sI -L http://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
+		asp_extra_check=$(curl -sI -L http://"$host" | grep -i "x-aspnet" | awk '{$1=""}1')
 	fi
 	#use to store the wordcount
 	test_xpb=$(echo $Header_Data | wc -w)

@@ -49,14 +49,26 @@ else
 	fi
 fi
 
-echo -e "\nNow querying the host's web server version"
+#POTENTIAL REDIRECT CHECK. NOT SURE IF NECESSARY
+#curl -s -I -o redirectmaybe.txt $host
+#redirected=$(cat redirectmaybe.txt | grep -i "HTTP/" | awk '{print $2}')
+#echo $redirected
+#if [[ $redirected == "301" ]]
+#then
+	#new_address=$(cat redirectmaybe.txt | grep -i "Location" | awk '{print $2}')
+	#echo "Attempts to access this URL return a redirect address. Please use the following address and run the script again:" $new_address
+#else
+	#echo "No redirect found"
+#fi
+#exit
+#echo -e "\nNow querying the host's web server version"
 
 webservercheck
 
 echo -e "\nBeginning test for supported http methods on the host"
 
 httpmethods
-
+exit
 #these flags will be used during text file output later
 found_php=false
 found_js=false
@@ -102,7 +114,7 @@ echo -e "\nNow probing target to determine TLS ciphersuite"
 #the below code will make a curl request to see if host responds to https requests. Will be empty
 #if https is unavailable, meaning the ciphersuite analysis will be bypassed
 #could do this using openssl -connect but this achieves the same goal
-httpscheck=$(curl -s https://$host)
+httpscheck=$(curl -s -L https://$host)
 httpscheck_wc=$(echo $httpscheck | wc -w)
 
 #enum_ciphers isn't playing nice within the main script. Must fix!!!!
