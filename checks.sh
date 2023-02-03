@@ -10,12 +10,13 @@ source resourceaccess.sh
 source mention.sh
 
 #flags to alter script behaviour
-while getopts h:p:f:w: flag
+while getopts h:p:f:r:w: flag
 do
 	case "${flag}" in
 		h) host=${OPTARG};;
 		p) publicsite=${OPTARG};;
 		f) force=${OPTARG};;
+		r) resourceskip=${OPTARG};;
 		w) wapp=${OPTARG};;
 
 	esac
@@ -27,6 +28,8 @@ echo "hopefully be able to discover basic components of the remote"
 echo "host using common enumeration techniques"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
+phpmyadmin
+exit
 #pingtest for host's availability. WIll exit if host is unreachable
 ping $host -q -c 4 2>&1 >/dev/null
 
@@ -68,11 +71,12 @@ webservercheck
 echo -e "\nBeginning test for supported http methods on the host"
 
 httpmethods
-exit
+
 #these flags will be used during text file output later
 found_php=false
 found_js=false
 found_asp=false
+found_framework=false
 successful_tests_php=0
 successful_tests_js=0
 successful_tests_asp=0
@@ -80,7 +84,12 @@ successful_tests_asp=0
 ######MULTIPLE######
 echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries"
 xpoweredby
-resourceaccess
+if [[ $resourceskip == "y" ]] #skips resource check if flag is given
+then
+	false
+else
+	resourceaccess
+fi
 #mention DOESN'T WORK!!!!!
 ####################
 

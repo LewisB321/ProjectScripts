@@ -2,7 +2,7 @@
 
 xpoweredby(){
 
-	#Try to retrieve x-powered-by header information. Conditional statement for whether https should be tried
+	#Try to retrieve x-powered-by header information. Conditional statement for public host
 	if [[ $publicsite == 'y' ]]
 	then
 		Header_Data=$(curl -sI -L https://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
@@ -11,24 +11,25 @@ xpoweredby(){
 		Header_Data=$(curl -sI -L http://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
 		asp_extra_check=$(curl -sI -L http://"$host" | grep -i "x-aspnet" | awk '{$1=""}1')
 	fi
-	#use to store the wordcount
+	#wordcount store
 	test_xpb=$(echo $Header_Data | wc -w)
 	#echo $Header_Data
 
-	#variable won't be empty if the header was retrieved
+	#variable empty if header not there
 	if [[ $test_xpb == 0 ]]
 	then
 		echo -e "\nX-Powered-By header not present"
 	else
 		echo -e "\nX-Powered-By header present. Attempting to discover technologies\n"
 		#echo $Header_Data
+		frameworkcheck
 		aspcheck
 		phpcheck
 		jscheck
 	fi
 }
 
-	#I've added another check that's just for ASP.NET. Sometimes there may be a x-ASPNET(MSV)-version header that we can also look for
+	#Sometimes there may be a x-ASPNET(MSV)-version header that we can also look for
 aspcheck(){
 	#function for grepping header return for string "ASP.NET"
 	asp_check=$(echo $Header_Data | grep -i "ASP.NET")
@@ -36,7 +37,7 @@ aspcheck(){
 	asp_extra_check_wc=$(echo $asp_extra_check | wc -w)
 	if [[ $asp_check_wc == 0 ]]
 	then
-		echo "ASP.NET undiscovered by xpb"
+		echo "ASP.NET undiscovered by header data"
 	else
 		if [[ $asp_extra_check_wc == 0 ]]
 		then
@@ -63,10 +64,18 @@ phpcheck(){
 }
 
 jscheck(){
-	#function for grepping header return for string for several indications of JS
-	echo "Express" > jschecklist
-	echo "Node.js" >> jschecklist
-	echo "AngularJS" >> jschecklist
+	#function for grepping header return for string for several indications of JS. Could be extended but for proof of concept this is fine
+	echo "express" > jschecklist
+	echo "node" >> jschecklist
+	echo "backbone" >> jschecklist
+	echo "vue" >> jschecklist
+	echo "angularJS" >> jschecklist
+	echo "ember" >> jschecklist
+	echo "bootstrap" >> jschecklist
+	echo "dojo" >> jschecklist
+	echo "requireJS" >> jschecklist
+	echo "jquery" >> jschecklist
+	echo "react" >> jschecklist
 
 	js_check=$(echo $Header_Data | grep -i -f jschecklist)
 	js_check_wc=$(echo $js_check | wc -w)
@@ -77,4 +86,23 @@ jscheck(){
 		echo "JavaScript libraries/frameworks discovered on host:"$js_check
 		found_js=true
 	fi
+	rm jschecklist
+}
+
+frameworkcheck(){
+	#function for grepping header return for framework indication. Big longshot
+	echo "wordpress" > frameworkchecklist
+	echo "laravel" >> frameworkchecklist
+	echo "ruby" >> frameworkchecklist #ruby on rails
+
+	framework_check=$(echo $Header_Data | grep -i -f frameworkchecklist)
+	framework_check_wc=$(echo $framework_check | wc -w)
+	if [[ $framework_check_wc == 0 ]]
+	then
+		echo "Application framework undiscovered by header data"
+	else
+		echo "Application framework discovered on host:"$framework_check
+		found_framework=true
+	fi
+	rm frameworkchecklist
 }

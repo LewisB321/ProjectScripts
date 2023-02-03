@@ -3,25 +3,37 @@
 
 resourceaccess() {
 
-	#Attempt to read all from /resources (last resort, very unlikely to work)
+	#Attempt to access and read contents of /access
 
-	#200 if this folder exists, 404 if not. Check before it reads contents
+	#200 if this folder exists and accessible
 	if [[ $publicsite == "y" ]]
 	then
-		returncode=$(curl -sI -L https://$host/resources/ | grep "HTTP" | awk '{print $2}')
+		returncode=$(curl -sI https://www.$host/resources/ | grep "HTTP" | awk '{print $2}')
 	else
-		returncode=$(curl -sI -L $host/resources/ | grep "HTTP" | awk '{print $2}')
+		returncode=$(curl -sI http://www.$host/resources/ | grep "HTTP" | awk '{print $2}')
 	fi
 	if [[ $returncode != 200 ]]
 	then
-		echo -e "\nResource folder not present"
+		echo -e "\nResources folder not present"
 	else
-		echo -e "\nResource folder access successful. While this script will cherrypick .js and .php files, it's worth manually verifying by visiting {host}/resources"
-		echo "Note: test may not be 100% accurate. Please visit /resources to manually verify. Some hosts may use this space for a different purpose"
-		curl -s -o ra.txt $host/resources/ 
+		echo -e "\n/resources folder found"
+		echo "Note: Please visit /resources to manually verify. Some hosts may use this space for a different purpose and this test does not make that distinction"
+		echo "If you know a host is using this space for a different purpose, please use the -r flag"
+
+		#output the contents to a txt file to preserve html format
+		if [[ $publicsite == "y" ]]
+		then
+			curl -s -o ra.txt https://www.$host/resources/ 
+		else
+			curl -s -o ra.txt http://www.$host/resources/ 
+		fi
+
 		ra_js
 		ra_php
+		#cleaning up
+		rm ra.txt
 	fi
+	
 
 }
 
@@ -33,12 +45,11 @@ ra_js() {
 	#decides whether anything with the .js extension has been found
 	if [[ $jsfile_wc == 0 ]]
 	then
-		echo -e "\nResource folder present but couldn't find a trace of JS"
+		echo -e "\nNo traces of JavaScript in /resources"
 	else
 		echo -e "\nJS identified in the resource folder"
-		echo "Below are all the discovered files in /resources that contain the .js extension"
 		echo $jsfiles
-		echo -e "\nNote: These are only the scripts used on the host, they may not contain any indication of vulnerability"
+		echo -e "\nNote: May not contain any indication of vulnerability"
 		found_js=true
 	fi
 }
@@ -52,12 +63,11 @@ ra_php() {
 	#decides whether anything with the .js extension has been found
 	if [[ $phpfiles_wc == 0 ]]
 	then
-		echo -e "\nResource folder present but couldn't find a trace of PHP"
+		echo -e "\nNo traces of PHP in /resources"
 	else
 		echo -e "\nPHP identified in the resource folder"
-		echo "Below are all the discovered files in /resources that contain the .php extension"
 		echo $phpfiles
-		echo -e "\nNote: These are only the files used on the host, they may not contain any indication of vulnerability"
+		echo -e "\nNote: May not contain any indication of vulnerability"
 		found_php=true
 	fi
 }
