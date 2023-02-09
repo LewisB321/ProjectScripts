@@ -27,8 +27,14 @@ jsfolderaccess() {
 	#Attempt to read all from /js
 
 	#200 if this folder exists, 404 if not. Check before it reads contents
-	returncode=$(curl -sI https://$host/js/ | grep "HTTP" | awk '{print $2}')
-	if [[ $returncode != 200 ]]
+	if [[ $publicsite == "y" ]]
+	then
+		returncode=$(curl -sI -L https://$host/js/ | grep "HTTP" | awk '{print $2}')
+	else
+		returncode=$(curl -sI -L http://$host/js/ | grep "HTTP" | awk '{print $2}')
+	fi
+
+	if [[ ! $returncode =~ 200 ]]
 	then
 		echo -e "\nJS folder not present"
 	else

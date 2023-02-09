@@ -52,7 +52,9 @@ aspcheck(){
 
 phpcheck(){
 	#function for grepping header return for string "PHP"
+	#had to add regex check for the hashtopolis example. Does not affect others
 	php_check=$(echo $Header_Data | grep -i "PHP")
+	php_check=$(echo $php_check | grep -o "^[^-]*")
 	php_check_wc=$(echo $php_check | wc -w)
 	if [[ $php_check_wc == 0 ]]
 	then

@@ -22,15 +22,15 @@ do
 	esac
 done
 
+resourceaccess
+exit
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. This brief script will" 
 echo "hopefully be able to discover basic components of the remote"
 echo "host using common enumeration techniques"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-phpmyadmin
-exit
-#pingtest for host's availability. WIll exit if host is unreachable
+#pingtest for host's availability. Will exit if host is unreachable
 ping $host -q -c 4 2>&1 >/dev/null
 
 #return code from ping is always 0 if host can be reached
@@ -51,20 +51,6 @@ else
 		fi
 	fi
 fi
-
-#POTENTIAL REDIRECT CHECK. NOT SURE IF NECESSARY
-#curl -s -I -o redirectmaybe.txt $host
-#redirected=$(cat redirectmaybe.txt | grep -i "HTTP/" | awk '{print $2}')
-#echo $redirected
-#if [[ $redirected == "301" ]]
-#then
-	#new_address=$(cat redirectmaybe.txt | grep -i "Location" | awk '{print $2}')
-	#echo "Attempts to access this URL return a redirect address. Please use the following address and run the script again:" $new_address
-#else
-	#echo "No redirect found"
-#fi
-#exit
-#echo -e "\nNow querying the host's web server version"
 
 webservercheck
 
@@ -100,7 +86,12 @@ phpmyadmin
 
 ##########JS###########
 nmapscript_referer
-jsfolderaccess
+if [[ $resourceskip == "y" ]] #skips resource check if flag is given
+then
+	false
+else
+	jsfolderaccess
+fi
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
 if echo $* | grep -e "-w" -q

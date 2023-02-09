@@ -8,16 +8,16 @@ resourceaccess() {
 	#200 if this folder exists and accessible
 	if [[ $publicsite == "y" ]]
 	then
-		returncode=$(curl -sI https://www.$host/resources/ | grep "HTTP" | awk '{print $2}')
+		returncode=$(curl -sI -L https://www.$host/resources/ | grep "HTTP" | awk '{print $2}')
 	else
-		returncode=$(curl -sI http://www.$host/resources/ | grep "HTTP" | awk '{print $2}')
+		returncode=$(curl -sI -L http://$host/resources/ | grep "HTTP" | awk '{print $2}')
 	fi
-	if [[ $returncode != 200 ]]
+	if [[ ! $returncode =~ 200 ]]
 	then
 		echo -e "\nResources folder not present"
 	else
 		echo -e "\n/resources folder found"
-		echo "Note: Please visit /resources to manually verify. Some hosts may use this space for a different purpose and this test does not make that distinction"
+		echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
 		echo "If you know a host is using this space for a different purpose, please use the -r flag"
 
 		#output the contents to a txt file to preserve html format
@@ -25,7 +25,7 @@ resourceaccess() {
 		then
 			curl -s -o ra.txt https://www.$host/resources/ 
 		else
-			curl -s -o ra.txt http://www.$host/resources/ 
+			curl -s -o ra.txt http://$host/resources/ 
 		fi
 
 		ra_js

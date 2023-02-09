@@ -23,8 +23,8 @@ mention(){
 	else
 		echo -e "\n"
 		mention_JavaScript
-		#mention_php
-		#mention_asp
+		mention_php
+		mention_asp
 	fi
 	
 		
