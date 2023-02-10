@@ -4,34 +4,44 @@
 resourceaccess() {
 
 	#Attempt to access and read contents of /access
-
-	#200 if this folder exists and accessible
 	if [[ $publicsite == "y" ]]
 	then
 		returncode=$(curl -sI -L https://www.$host/resources/ | grep "HTTP" | awk '{print $2}')
+		indexpage=$(curl -sI -L https://$host | wc -c)	
+		resourcefolder=$(curl -sI -L https://$host/resources | wc -c)
 	else
 		returncode=$(curl -sI -L http://$host/resources/ | grep "HTTP" | awk '{print $2}')
+		indexpage=$(curl -sI -L http://$host | wc -c)	
+		resourcefolder=$(curl -sI -L http://$host/resources | wc -c)
 	fi
-	if [[ ! $returncode =~ 200 ]]
+
+
+	#silent direct checker
+	if [ $indexpage -eq $resourcefolder ]
 	then
-		echo -e "\nResources folder not present"
+		echo "Silent redirect detected when attempting to access /resources"
 	else
-		echo -e "\n/resources folder found"
-		echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
-		echo "If you know a host is using this space for a different purpose, please use the -r flag"
-
-		#output the contents to a txt file to preserve html format
-		if [[ $publicsite == "y" ]]
+		if [[ ! $returncode =~ 200 ]]
 		then
-			curl -s -o ra.txt https://www.$host/resources/ 
+			echo -e "\nResources folder not present"
 		else
-			curl -s -o ra.txt http://$host/resources/ 
-		fi
+			echo -e "\n/resources folder found"
+			echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
+			echo "If you know a host is using this space for a different purpose, please use the -r flag"
 
-		ra_js
-		ra_php
-		#cleaning up
-		rm ra.txt
+			#output the contents to a txt file to preserve html format
+			if [[ $publicsite == "y" ]]
+			then
+				curl -s -o ra.txt https://www.$host/resources/ 
+			else
+				curl -s -o ra.txt http://$host/resources/ 
+			fi
+
+			ra_js
+			ra_php
+			#cleaning up
+			rm ra.txt
+		fi
 	fi
 	
 

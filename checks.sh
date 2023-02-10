@@ -8,6 +8,7 @@ source https-ciphers.sh
 source xpoweredby.sh
 source resourceaccess.sh
 source mention.sh
+source wapp.sh
 
 #flags to alter script behaviour
 while getopts h:p:f:r:w: flag
@@ -22,7 +23,7 @@ do
 	esac
 done
 
-resourceaccess
+wappalyzer
 exit
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. This brief script will" 
