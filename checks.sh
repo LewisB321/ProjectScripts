@@ -9,6 +9,7 @@ source xpoweredby.sh
 source resourceaccess.sh
 source mention.sh
 source wapp.sh
+source etag.sh
 
 #flags to alter script behaviour
 while getopts h:p:f:r:w: flag
@@ -23,7 +24,7 @@ do
 	esac
 done
 
-wappalyzer
+etag_check
 exit
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. This brief script will" 
