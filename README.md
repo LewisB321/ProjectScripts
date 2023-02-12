@@ -3,27 +3,20 @@
 CHECKS.SH = MAIN SCRIPT. ONLY USE THIS, OTHERS ARE JUST WHERE THE FUNCTIONS ARE
 
 Flags:
-p - for public sites. Will add https:// by default when running some of the tests. For now i've disabled the API lookup because it's gonna ruin my free usage
-f - force. Use this for any public sites because 9/10 times they won't respond to pings
-h - hostname. Can be url or just ip
+p - Public. yes or https:// 
+f - Force. Use this for any public sites because 9/10 times they won't respond to pings
+h - Hostname. Can be url or ip. Takes port number as an argument as well i.e. 172.17.0.2:3000
+w - Wappaylzer. Uses API of Wappalyzer tool. I have limited calls so be nice
+r - Resource(skip). Skips the checks for /resources and /js if you know it's used for other purposes
 
-by default p & f will be set to no. If you wanna enable them, do -p y or -f y
+These flags are no by default so you only have to specify if you want them on
+
 
 PUBLIC EXAMPLE:
-bash checks.sh -h www.twitter.com -p y -f y
+bash checks.sh -h www.twitter.com -p y -f y -w y -r y
 
 PRIVATE EXAMPLE:
 bash checks.sh -h localhost
 
-TEST1 - WEB SERVER VERSION. Works but fairly useless unless target is Apache, won't advertise version number
-
-
-TEST2 - HTTP METHODS. Works but again fairly useless since 99% of the time they will be safe
-
-
-TEST3 - MULTIPLE SUBTESTS FOR JS/PHP. Still a work in progress, especially making the output useful
-
-
-TEST4 - ENCRYPTION. Still doesn't play nice in the main script so you'll have to run it individually :-(
-
-TWITTER IS AN ASSHOLE SITE SO IT OMITS WWW OR THE TESTS DON'T WORK >:(
+RESOURCE AND JAVASCRIPT FOLDER LOOKUP DOESN'T WORK >:(
+At the end you'll be asked if you want to output findings to a text file. Work in progress.
