@@ -72,7 +72,7 @@ echo_results() {
 	#provide an output as to how many instances each algorithm grade has
 	for ((i=0;i<=$len1;i++))
 	do
-		for ((j=0;j<=$len2;j++))
+		for ((j=0;j<$len2;j++))
 		do
 			if [ $i -eq $j ]
 			then

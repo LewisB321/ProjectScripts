@@ -3,7 +3,14 @@
 nmapscript_referer(){
 
 	#Use nmap http-referer-checker script
-	nmap_scan=$(nmap -p80,443 --script http-referer-checker.nse $host)
+	#use grep & sed to remove any instances of port number from the host temporarily
+	if echo $host | grep -q ':'
+	then
+		temp_host=$(echo $host | grep -oP '(.*?)\:' | sed 's/://')
+		nmap_scan=$(nmap -p80,443 --script http-referer-checker.nse $temp_host)
+	else
+		nmap_scan=$(nmap -p80,443 --script http-referer-checker.nse $host)
+	fi
 
 	#used to store wordcount
 	test_nmap=$(echo $nmap_scan | grep "Couldn't find any cross-domain scripts" | wc -w)
