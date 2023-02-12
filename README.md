@@ -3,6 +3,8 @@
 CHECKS.SH = MAIN SCRIPT. ONLY USE THIS, OTHERS ARE JUST WHERE THE FUNCTIONS ARE
 
 Flags:
+
+
 p - Public. yes or https:// 
 
 
