@@ -1,0 +1,48 @@
+for ((i=0; i<=${#wapparray[@]}; i++))
+do
+if [[ ${wapparray[i]} == *'"categories":["JavaScript libraries"]}'* ]]
+then
+echo "JavaScript"
+else
+echo "Not JavaScript"
+fi
+done
+
+refined_array=()
+rm jstechnologies_wap.txt
+touch jstechnologies_wap.txt
+for ((i=0; i<=${#wapparray[@]}; i++));do
+	if [[ ${wapparray[i]} =~ .*JavaScript.* ]]
+	then
+		#echo ${wapparray[i]}
+		refined_array+=(${wapparray[i]})
+		for ((a=1; a<=10; a++))
+		do
+			if [[ ${wapparray[i-a]} =~ .*categories.* ]]
+			then
+				break
+			else	
+				#echo ${wapparray[i-a]}
+				refined_array+=(${wapparray[i-a]})
+			fi
+		done
+	else
+		false
+	fi
+done
+
+for (( i=0; i<=${#refined_array[@]}; i++ ))
+do
+if [[ "${refined_array[$i]}" == *"hits"* ]]
+then
+	unset 'refined_array[$i]'
+fi
+done
+
+for element in "{$refined_array[@]}"
+do
+echo $element | tr -d '"{}' >> jstechnologies_wap.txt
+done
+
+ sed '/^$/d; /\bname\b/{N; s/\n\(.*categories\)/\n\n\1/};'  jstechnologies_wap.txt > wapresults_js.txt
+rm jstechnologies_wap.txt
