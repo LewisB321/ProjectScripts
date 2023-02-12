@@ -24,7 +24,7 @@ do
 	esac
 done
 
-etag_check
+wappalyzer
 exit
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. This brief script will" 
