@@ -7,21 +7,21 @@ httpmethods(){
 	#if secondary header is present (i.e. on a 204 code) then the wordcount will be altered
 	if [[ $publicsite == "y" ]]
 	then
-		methods=$(curl -sI -L -X OPTIONS https://$host | grep -i "Allow:" |awk '{$1=""}1')
+		methods=$(curl -sI -L -X OPTIONS https://"$host" | grep -i "Allow:" | awk '{$1=""}1')
 		methods_wc=$(echo $methods | wc -w)
 		if [[ $methods_wc == 0 ]]
 		then
-			methods=$(curl -sI -L -X OPTIONS https://$host | grep -i "Access-Control-Allow-Methods:" |awk '{$1=""}1')
+			methods=$(curl -sI -L -X OPTIONS https://"$host" | grep -i "Access-Control-Allow-Methods:" | awk '{$1=""}1')
 			methods_wc=$(echo $methods | wc -w)
 		else
 			false
 		fi
 	else
-		methods=$(curl -sI -L -X OPTIONS http://$host | grep -i "Allow:" |awk '{$1=""}1')
+		methods=$(curl -sI -L -X OPTIONS http://"$host" | grep -i "Allow:" | awk '{$1=""}1')
 		methods_wc=$(echo $methods | wc -w)
 		if [[ $methods_wc == 0 ]]
 		then
-			methods=$(curl -sI -L -X OPTIONS http://$host | grep -i "Access-Control-Allow-Methods:" |awk '{$1=""}1')
+			methods=$(curl -sI -L -X OPTIONS http://"$host" | grep -i "Access-Control-Allow-Methods:" | awk '{$1=""}1')
 			methods_wc=$(echo $methods | wc -w)
 		else
 			false
@@ -29,16 +29,12 @@ httpmethods(){
 	fi
 	
 
-
-
-
-	
-
 	#final check whether unsecure methods are present
 	if [[ $methods_wc == 0 ]]
 	then
 		echo "No http methods could be identified"
 	else
+		found_methods=true
 		#read into an array
 		IFS="," read -a MethodsArray <<< $methods
 
@@ -69,12 +65,12 @@ httpmethods(){
 				((unsecuremethodcounter=unsecuremethodcounter+1))
 			fi
 		done
-		echo -e "\nThe supported http methods on the host are as follows:" ${MethodsArray[@]}
+		echo "The supported http methods on the host are as follows:" ${MethodsArray[@]}
 		if [[ $unsecuremethodcounter != 0 ]]
 		then
 			#outputs how many unsecure methods are found
 			echo "There are $unsecuremethodcounter unsecure http methods supported by the host"
-			echo -e "\nFor more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods to learn more"
+			echo -e "\nFor more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods"
 		else
 			echo "No unsecure http methods discovered"
 		fi

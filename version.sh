@@ -10,72 +10,29 @@ latest_version_iis="Microsoft-IIS/10.0"
 #standard public check
 if [[ $publicsite == 'y' ]]
 then
-	version=$(curl -sI https://"$host" | grep -i "Server" | awk '{print $2}')
+	version=$(curl -sI -L https://"$host" | grep -m 1 -iw "Server:" | awk '{print $2}')
 else
-	version=$(curl -sI http://"$host" | grep -i "Server" | awk '{print $2}')
+	version=$(curl -sI -L http://"$host" | grep -m 1 -iw "Server:" | awk '{print $2}')
 fi
 
 #wordcount for later use
 version_wc=$(echo $version | wc -w)
 
-#flags for later use
-isapache=false
-isnginx=false
-isgunicorn=false
-isiis=false
-hasversion=false
-webservlatest=false
-
-
-#tests to determine different webserver software
-test_for_apache=$(echo $version | grep -o "Apache" | wc -w)
-if [[ $test_for_apache == 1 ]]
-then
-	isapache=true
-else
-	false
-fi
-
-test_for_nginx=$(echo $version | grep -o "nginx" | wc -w)
-if [[ $test_for_nginx == 1 ]]
-then
-	isnginx=true
-else
-	false
-fi
-
-test_for_gunicorn=$(echo $version | grep -o "gunicorn" | wc -w)
-if [[ $test_for_gunicorn == 1 ]]
-then
-	isgunicorn=true
-else
-	false
-fi
-
-test_for_iis=$(echo $version | grep -o "IIS" | wc -w)
-if [[ $test_for_iis == 1 ]]
-then
-	isiis=true
-else
-	false
-fi
-
-
 #check whether anything in variable i.e. whether anything at all has been grepped
 identified=$(echo $version | wc -w)
 
 #will output web server version if it's been found
-if [[ $identified != 1 ]]
+if [[ $identified == 0 ]]
 then
 	echo "Web server could not be identified"
 else
-	echo "The web server detected on the host is:" $version
+	echo "The web server detected on the host is: "$version
+	found_webserver=true
 fi
-
 #check to see whether numbers are present i.e. a version number 
 if [[ $version =~ [0-9] ]]
 then
-	hasversion=true
+	has_version=true
 else
 	#quick check uisng the wordcount to end the function if nothing is returned from the version. If not, the else clause always runs
 	if [[ $version_wc == 0 ]]
@@ -86,30 +43,65 @@ else
 	fi
 fi
 
-#final comparison if version number has been identified. A check is ran based on earlier flags and a comparison is made based on the correct software
-if [[ $hasversion == true ]]
+#tests to determine different webserver software
+test_for_apache=$(echo $version | grep -o "Apache" | wc -w)
+if [[ $test_for_apache == 1 ]]
 then
-	#charcount is used because I needed to remove the newline character from $version in order to compare it to the hardcoded latest version that I have
+	is_apache=true
+else
+	false
+fi
+
+test_for_nginx=$(echo $version | grep -o "nginx" | wc -w)
+if [[ $test_for_nginx == 1 ]]
+then
+	is_nginx=true
+else
+	false
+fi
+
+test_for_gunicorn=$(echo $version | grep -o "gunicorn" | wc -w)
+if [[ $test_for_gunicorn == 1 ]]
+then
+	is_gunicorn=true
+else
+	false
+fi
+
+test_for_iis=$(echo $version | grep -o "IIS" | wc -w)
+if [[ $test_for_iis == 1 ]]
+then
+	is_iis=true
+else
+	false
+fi
+
+#final comparison if version number has been identified. A check is ran based on earlier flags and a comparison is made 
+#based on the correct software
+if [[ $has_version == true ]]
+then
+	#charcount is used because I needed to remove the newline character from $version in order to compare it 
+	#to the hardcoded latest version that I have
 	charcount_1=$(echo -n $version | wc -c)
-	if [[ $isapache == true ]]
+	if [[ $is_apache == true ]]
 	then
 		apache_ver_check
 	else
 		false
 	fi
-	if [[ $isnginx == true ]]
+	if [[ $is_nginx == true ]]
 	then
 		nginx_ver_check
 	else
 		false
 	fi
-	if [[ $isgunicorn == true ]]
+	if [[ $is_gunicorn == true ]]
 	then
 		gunicorn_ver_check
 	else
 		false
 	fi
-	if [[ $isiis == true ]]
+	if [[ $is_iis == true ]]
 	then
 		iis_ver_check
 	else
@@ -122,8 +114,8 @@ fi
 
 #placed the check code inside of their own functions to help with scalability if necessary
 apache_ver_check() {
-	charcount_apache=$(echo $latest_version_apache | wc -c)
-	if [[ $charcount_1 == $charcount_apache ]]
+	apache=$(echo -n $version)
+	if [[ $latest_version_apache == $apache ]]
 	then
 		echo "Latest Apache version identified"
 		webservlatest=true
@@ -135,8 +127,8 @@ apache_ver_check() {
 }
 
 nginx_ver_check() {
-	charcount_nginx=$(echo $latest_version_nginx | wc -c)
-	if [[ $charcount_1 == $charcount_nginx ]]
+	nginx=$(echo -n $version)
+	if [[ $latest_version_nginx == $nginx ]]
 	then
 		echo "Latest nginx version identified"
 		webservlatest=true
@@ -148,8 +140,8 @@ nginx_ver_check() {
 }
 
 gunicorn_ver_check() {
-	charcount_gun=$(echo $latest_version_gunicorn | wc -c)
-	if [[ $charcount_1 == $charcount_gun ]]
+	gun=$(echo -n $version)
+	if [[ $latest_version_gunicorn == $gun ]]
 	then
 		echo "Latest gunicorn version identified"
 		webservlatest=true
@@ -161,8 +153,8 @@ gunicorn_ver_check() {
 }
 
 iis_ver_check() {
-	charcount_iis=$(echo $latest_version_iis | wc -c)
-	if [[ $charcount_1 == $charcount_iis ]]
+	iis=$(echo -n $version)
+	if [[ $latest_version_iis == $iis ]]
 	then
 		echo "Latest IIS version identified"
 		webservlatest=true

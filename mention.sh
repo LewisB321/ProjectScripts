@@ -110,7 +110,7 @@ mention_asp(){
 
 	mention_asp=$(echo $webpage | grep -i -f mention_asp.txt)
 	mention_asp_wc=$(echo $mention_asp | wc -w)
-
+	rm mention_asp.txt
 	if [[ $mention_asp_wc == 0 ]]
 	then
 		echo "No mention of ASP.NET in source code"

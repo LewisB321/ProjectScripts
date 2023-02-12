@@ -62,7 +62,7 @@ jsfolderaccess() {
 			curl -s -o JSfolder.txt $host/js/ 
 			jsfolderfiles=$(grep -o -P 'href=.*\.js(?=">)' JSfolder.txt | sed 's/href="//')
 			jsfolderfiles_wc=$(echo $jsfolderfiles | wc -w)
-			
+			rm JSfolder.txt
 
 			if [[ $jsfolderfiles_wc == 0 ]]
 			then

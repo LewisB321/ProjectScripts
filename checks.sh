@@ -24,8 +24,6 @@ do
 	esac
 done
 
-wappalyzer
-exit
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. This brief script will" 
 echo "hopefully be able to discover basic components of the remote"
@@ -38,7 +36,7 @@ ping $host -q -c 4 2>&1 >/dev/null
 #return code from ping is always 0 if host can be reached
 if [[ $? == 0 ]]
 then
-	echo "The host appears to be online. Moving on"
+	false
 else
 	echo "The host appears to be offline or not responding to a pingtest. "
 	#exit 1
@@ -53,10 +51,10 @@ else
 		fi
 	fi
 fi
-
+echo -e "\nBeginning test for web server\n"
 webservercheck
 
-echo -e "\nBeginning test for supported http methods on the host"
+echo -e "\nBeginning test for supported http methods on the host\n"
 
 httpmethods
 
@@ -72,10 +70,12 @@ successful_tests_asp=0
 ######MULTIPLE######
 echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries"
 xpoweredby
+echo -e "\n"
 if [[ $resourceskip == "y" ]] #skips resource check if flag is given
 then
 	false
 else
+	echo "Now attempting to read the contents of /resources"
 	resourceaccess
 fi
 #mention DOESN'T WORK!!!!!
@@ -92,8 +92,10 @@ if [[ $resourceskip == "y" ]] #skips resource check if flag is given
 then
 	false
 else
+	echo "Now attempting to read the contents of /js"
 	jsfolderaccess
 fi
+
 #optional test which depends on whether the site is publicly available or not
 #uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
 if echo $* | grep -e "-w" -q
@@ -132,41 +134,40 @@ read -p "Would you like to output this summary to a text file? (Y/N)" output
 
 if [[ $output == 'y' ]]
 then
-	echo "Outputting information to text file remote-host-summary.txt"
+	#making the timestamped file
+	timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
+	file_name=$host"_"$timestamp".txt"
+	touch $file_name
 
-	#Web server output
-	if [[ $identified != 1 ]]
+	###########################WEBSERVER OUTPUT###############################
+	if [ $found_webserver ]
 	then
-		echo "Webserver could not be identified on" $host
-	else
-		echo "Webserver: "$version > remote-host-summary.txt
-		if [[ $webservlatest == false ]]
+		echo "Webserver: "$version >> $file_name
+		if [ $has_version ]
 		then
-			echo "New webserver version available for download" >> remote-host-summary.txt
+			if [ $webservlatest ]
+			then
+				echo "Latest web server version detected" >> $file_name
+			else
+				echo "New version available for download" >> $file_name
+			fi
 		else
-			echo "Latest webserver version detected" >> remote-host-summary.txt
+			echo "Version could not be identified" >> $file_name
 		fi
-	fi
-
-	#http methods output
-	if [[ $methods_wc == 0 ]]
-	then
-		echo -e "\nhttp methods could not be identified on" $host
 	else
-		echo -e "\nMethods:"$methods >> remote-host-summary.txt 
-		if [[ $unsecuremethodcounter == 0 ]]
-		then
-			echo "No dangerous http methods identified" >> remote-host-summary.txt
-		else
-			echo $unsecuremethodcounter "Unsecure http methods found on host" >> remote-host-summary.txt
-			echo "Please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods for further information" >. remote-host-summary.txt
-		fi	
+		echo "Webserver could not be identified" >> $file_name
 	fi
-
-	#js version(s) output
-	echo "Placeholder for JS" >> remote-host-summary.txt
-	#ciphersuite analysis output
-	echo "Placeholder for Ciphersuite analysis" >> remote-host-summary.txt
+	########################################################################
+	echo " " >> $file_name
+	#########################METHODS OUTPUT#################################
+	if [ $found_methods ]
+	then
+		echo "HTTP Methods supported by the host: "${MethodsArray[@]} >> $file_name
+		echo "There are $unsecuremethodcounter unsecure http methods supported by the host" >> $file_name
+		echo "For more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods" >> $file_name
+	else
+		echo "Host is not advertising supported HTTP Methods" >> $file_name
+	fi
 else
-	false
+	echo "End of script"
 fi
