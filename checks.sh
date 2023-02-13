@@ -51,6 +51,7 @@ else
 		fi
 	fi
 fi
+
 echo -e "\nBeginning test for web server\n"
 webservercheck
 
@@ -58,19 +59,9 @@ echo -e "\nBeginning test for supported http methods on the host\n"
 
 httpmethods
 
-#these flags will be used during text file output later
-found_php=false
-found_js=false
-found_asp=false
-found_framework=false
-successful_tests_php=0
-successful_tests_js=0
-successful_tests_asp=0
-
 ######MULTIPLE######
-echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries"
+echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries\n"
 xpoweredby
-echo -e "\n"
 if [[ $resourceskip == "y" ]] #skips resource check if flag is given
 then
 	false
@@ -138,6 +129,7 @@ then
 	timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 	file_name=$host"_"$timestamp".txt"
 	touch $file_name
+	echo "results saved in the file "$file_name
 
 	###########################WEBSERVER OUTPUT###############################
 	if [ $found_webserver ]
@@ -158,8 +150,10 @@ then
 		echo "Webserver could not be identified" >> $file_name
 	fi
 	########################################################################
+
 	echo " " >> $file_name
-	#########################METHODS OUTPUT#################################
+
+	#############################METHODS OUTPUT#############################
 	if [ $found_methods ]
 	then
 		echo "HTTP Methods supported by the host: "${MethodsArray[@]} >> $file_name
@@ -168,6 +162,55 @@ then
 	else
 		echo "Host is not advertising supported HTTP Methods" >> $file_name
 	fi
+	########################################################################
+
+	echo " " >> $file_name
+
+	###########################XPB OUTPUT###################################
+	if [ $found_asp_no_version ]
+	then
+		echo "ASP disclosed but no version number identified" >> $file_name
+	else
+		if [ $found_asp ]
+		then
+			echo "ASP version disclosed by XPB Header: "$asp_extra_check >> $file_name
+		else
+			echo "ASP undisclosed by XPB Header" >> $file_name
+		fi
+	fi
+
+	if [ $found_php ]
+	then
+		echo "PHP version disclosed by XPB Header: "$php_check >> $file_name
+	else
+		echo "PHP undisclosed by XPB Header" >> $file_name
+	fi
+
+	if [ $found_js ]
+	then
+		echo "JS libraries/versions disclosed by XPB Header: "js_check >> $file_name
+	else
+		echo "JS undisclosed by XPB Header" >> $file_name
+	fi
+
+	if [ $found_framework ]
+	then
+		echo "Framework disclosed by XPB Header: "$framework_check >> $file_name
+	else
+		echo "Framework undisclosed by XPB Header" >> $file_name
+	fi
+	############################################################################
+
+	echo " " >> $file_name
+
+	################################http_referer################################
+	if [ $http_referer_successful ]
+	then
+		echo "Successful nmap script placeholder" >> $file_name
+	else
+		echo "Host is not using any external JS scripts" >> $file_name
+	fi
+	############################################################################
 else
 	echo "End of script"
 fi

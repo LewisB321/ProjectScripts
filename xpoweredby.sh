@@ -42,7 +42,7 @@ aspcheck(){
 		if [[ $asp_extra_check_wc == 0 ]]
 		then
 			echo "ASP.NET discovered on host but no version identified"
-			found_asp=true
+			found_asp_no_version=true
 		else
 			echo "ASP.NET discovered version:"$asp_extra_check
 			found_asp=true

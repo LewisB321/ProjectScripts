@@ -30,8 +30,7 @@ nmapscript_referer(){
 		echo -e "\nFourth test (nmap http-referer script) was potentially successful"
 		#must tidy up???
 		echo "Raw nmap script output: " $nmap_scan
-		found_js=true
-		successful_tests=$((successful_tests+1))
+		http_referer_successful=true
 	fi
 }
 
