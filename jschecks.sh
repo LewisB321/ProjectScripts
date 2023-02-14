@@ -50,7 +50,7 @@ jsfolderaccess() {
 		jsfolder=$(curl -sI -L http://$host/js | wc -c)
 	fi
 
-	#silent redirect checker
+	#silent redirect checker. DOES NOT WORK WITH TWITTER
 	if [ $indexpage -eq $jsfolder ]
 	then
 		echo "Silent redirected detected when attempting to access /js"
@@ -76,15 +76,15 @@ jsfolderaccess() {
 				echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
 			else
 				echo -e "\nJS identified in the JS folder"
-				echo "Below are all the discovered files in /js that contain the .js extension"
-				echo $jsfolderfiles
-				exit
+				echo "Below are all the discovered files in /js that contain the .js extension:"
+				#echo $jsfolderfiles
 
-
-				IFS=' ' read -r -a allfiles <<< $(echo $jsfolderfiles | tr -d '[:space:]')
+				#using sed to remove instances of space that mess with how the string is read into the array
+				jsfolderfiles=$(echo $jsfolderfiles | sed 's/[[:space:]]*$//')
+				IFS=' ' read -ra allfiles <<< $jsfolderfiles
 				for element in ${allfiles[@]}
 				do
-					echo -e "\n"$element
+					echo $element
 				done
 
 

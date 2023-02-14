@@ -6,7 +6,7 @@ wappalyzer(){
 	#the custom API key is free but limited use
 
 	#comment the below when not using
-	wappresults=$(curl -sH "x-api-key: 6ZdlygJjAS8xTAN0jx79s5QRPH3NjLIS5ntAXPjY" "https://api.wappalyzer.com/lookup/v1/?url=https://$host")
+	wappresults=$(curl -sH "x-api-key: re6fXaDu8j3lGWOYV1jOs4FnkTtvZS0BSyLCOjid" "https://api.wappalyzer.com/lookup/v1/?url=https://$host")
 
 
 	#the api call will return invalid if the remote host can't be found. This if statement is to determine this

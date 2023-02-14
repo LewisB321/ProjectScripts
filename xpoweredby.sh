@@ -21,6 +21,7 @@ xpoweredby(){
 		echo -e "\nX-Powered-By header not present"
 	else
 		echo -e "\nX-Powered-By header present. Attempting to discover technologies\n"
+		xpb=true
 		#echo $Header_Data
 		frameworkcheck
 		aspcheck
@@ -42,10 +43,10 @@ aspcheck(){
 		if [[ $asp_extra_check_wc == 0 ]]
 		then
 			echo "ASP.NET discovered on host but no version identified"
-			found_asp_no_version=true
+			found_asp_no_version_xpb=true
 		else
 			echo "ASP.NET discovered version:"$asp_extra_check
-			found_asp=true
+			found_asp_xpb=true
 		fi
 	fi
 }
@@ -61,7 +62,7 @@ phpcheck(){
 		echo "PHP undiscovered by header data"
 	else
 		echo "PHP version discovered on host:"$php_check
-		found_php=true
+		found_php_xpb=true
 	fi
 }
 
@@ -85,8 +86,8 @@ jscheck(){
 	then
 		echo "JavaScript undiscovered by header data"
 	else
-		echo "JavaScript libraries/frameworks discovered on host:"$js_check
-		found_js=true
+		echo "JavaScript libraries/frameworks discovered on host: "$js_check
+		found_js_xpb=true
 	fi
 	rm jschecklist
 }
@@ -104,7 +105,7 @@ frameworkcheck(){
 		echo "Application framework undiscovered by header data"
 	else
 		echo "Application framework discovered on host:"$framework_check
-		found_framework=true
+		found_framework_xpb=true
 	fi
 	rm frameworkchecklist
 }

@@ -23,6 +23,8 @@ do
 
 	esac
 done
+mention
+exit
 
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. This brief script will" 
@@ -69,7 +71,10 @@ else
 	echo "Now attempting to read the contents of /resources"
 	resourceaccess
 fi
-#mention DOESN'T WORK!!!!!
+
+echo -e "\n"
+
+mention 
 ####################
 
 #####PHP#######
@@ -84,7 +89,7 @@ then
 	false
 else
 	echo "Now attempting to read the contents of /js"
-	jsfolderaccess
+	#jsfolderaccess
 fi
 
 #optional test which depends on whether the site is publicly available or not
@@ -102,7 +107,8 @@ else
 fi
 #######################
 
-
+########OTHERS#########
+etag_check
 
 echo -e "\nNow probing target to determine TLS ciphersuite"
 
@@ -120,6 +126,9 @@ else
 	echo "Host is suitable for ciphersuite analysis"
 	enum_ciphers
 fi
+########################
+
+
 
 read -p "Would you like to output this summary to a text file? (Y/N)" output
 
@@ -129,7 +138,7 @@ then
 	timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 	file_name=$host"_"$timestamp".txt"
 	touch $file_name
-	echo "results saved in the file "$file_name
+	echo "results saved in the file - "$file_name
 
 	###########################WEBSERVER OUTPUT###############################
 	if [ $found_webserver ]
@@ -167,37 +176,42 @@ then
 	echo " " >> $file_name
 
 	###########################XPB OUTPUT###################################
-	if [ $found_asp_no_version ]
+	if [ $xpb ]
 	then
-		echo "ASP disclosed but no version number identified" >> $file_name
-	else
-		if [ $found_asp ]
+		if [ $found_asp_no_version_xpb ]
 		then
-			echo "ASP version disclosed by XPB Header: "$asp_extra_check >> $file_name
+			echo "ASP discovered but no version number identified" >> $file_name
 		else
-			echo "ASP undisclosed by XPB Header" >> $file_name
+			if [ $found_asp_xpb ]
+			then
+				echo "ASP version discovered by XPB Header: "$asp_extra_check >> $file_name
+			else
+				echo "ASP undiscovered by XPB Header" >> $file_name
+			fi
 		fi
-	fi
 
-	if [ $found_php ]
-	then
-		echo "PHP version disclosed by XPB Header: "$php_check >> $file_name
-	else
-		echo "PHP undisclosed by XPB Header" >> $file_name
-	fi
+		if [ $found_php_xpb ]
+		then
+			echo "PHP version discovered by XPB Header: "$php_check >> $file_name
+		else
+			echo "PHP undiscovered by XPB Header" >> $file_name
+		fi
 
-	if [ $found_js ]
-	then
-		echo "JS libraries/versions disclosed by XPB Header: "js_check >> $file_name
-	else
-		echo "JS undisclosed by XPB Header" >> $file_name
-	fi
+		if [ $found_js_xpb ]
+		then
+			echo "JS libraries/versions discovered by XPB Header: "$js_check >> $file_name
+		else
+			echo "JS undiscovered by XPB Header" >> $file_name
+		fi
 
-	if [ $found_framework ]
-	then
-		echo "Framework disclosed by XPB Header: "$framework_check >> $file_name
+		if [ $found_framework_xpb ]
+		then
+			echo "Framework discovered by XPB Header: "$framework_check >> $file_name
+		else
+			echo "Framework undiscovered by XPB Header" >> $file_name
+		fi
 	else
-		echo "Framework undisclosed by XPB Header" >> $file_name
+		echo "X-Powered-By header not detected" >> $file_name
 	fi
 	############################################################################
 
