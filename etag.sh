@@ -2,9 +2,6 @@
 
 etag_check(){
 
-	has_etag=false
-
-
 	#simple check for presence of eTag header
 	if [[ $publicsite == 'y' ]]
 	then
@@ -20,7 +17,6 @@ etag_check(){
 	else
 		echo "eTag header present"
 		echo "Unless necessary, it's usually a good idea to remove this header"
-		echo "More information is available at your vendor's website"
 		has_etag=true
 	fi
 
