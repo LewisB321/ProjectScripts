@@ -28,6 +28,7 @@ resourceaccess() {
 			echo -e "\n/resources folder found"
 			echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
 			echo "If you know a host is using this space for a different purpose, please use the -r flag"
+			resource_folder_accessed=true
 
 			#output the contents to a txt file to preserve html format
 			if [[ $publicsite == "y" ]]
@@ -39,7 +40,6 @@ resourceaccess() {
 
 			ra_js
 			ra_php
-			#cleaning up
 			rm ra.txt
 		fi
 	fi
@@ -60,7 +60,7 @@ ra_js() {
 		echo -e "\nJS identified in the resource folder"
 		echo $jsfiles
 		echo -e "\nNote: May not contain any indication of vulnerability"
-		found_js=true
+		found_js_resource_access=true
 	fi
 }
 
@@ -78,6 +78,6 @@ ra_php() {
 		echo -e "\nPHP identified in the resource folder"
 		echo $phpfiles
 		echo -e "\nNote: May not contain any indication of vulnerability"
-		found_php=true
+		found_php_resource_access=true
 	fi
 }

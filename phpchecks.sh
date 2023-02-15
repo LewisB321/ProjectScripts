@@ -23,7 +23,7 @@ phpinfo(){
 	 	if [[ $php_returncode == 200 ]]
 	 	then
 	 		echo -e "\nphpinfo.php webpage found. Visit {host}/phpinfo.php to confirm"
-	 		found_php=true
+	 		found_phpinfo=true
 	 	else
 	 		if [[ $php_returncode == 403 ]]
 	 		then
@@ -55,6 +55,7 @@ phpmyadmin(){
 	 else
 	 	if [[ $myadmin_returncode == 200 ]]
 	 	then
+	 		found_phpmyadmin=true
 	 		echo -e "\nphpmyadmin directory detected. Visit {host}/phpmyadmin to confirm this"
 	 	else
 	 		if [[ $myadmin_returncode == 403 ]]
@@ -63,7 +64,7 @@ phpmyadmin(){
 	 		else
 	 			if [[ $myadmin_returncode == 301 ]]
 	 			then
-	 				echo "Redirect detected"
+	 				echo "Redirect detected when trying to access /phpmyadmin"
 	 			else
 					echo -e "\nphpmyadmin not detected"
 				fi

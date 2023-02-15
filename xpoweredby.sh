@@ -27,6 +27,7 @@ xpoweredby(){
 		aspcheck
 		phpcheck
 		jscheck
+		echo -e "\n"
 	fi
 }
 

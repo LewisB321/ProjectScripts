@@ -23,14 +23,11 @@ do
 
 	esac
 done
-mention
-exit
 
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo "Thank you for using this script. This brief script will" 
-echo "hopefully be able to discover basic components of the remote"
-echo "host using common enumeration techniques"
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "Thank you for using this script. Please contact" 
+echo "lewisblythe0121@gmail.com if something doesn't work"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 #pingtest for host's availability. Will exit if host is unreachable
 ping $host -q -c 4 2>&1 >/dev/null
@@ -57,22 +54,19 @@ fi
 echo -e "\nBeginning test for web server\n"
 webservercheck
 
-echo -e "\nBeginning test for supported http methods on the host\n"
+echo -e "\nBeginning test for supported http methods\n"
 
 httpmethods
 
 ######MULTIPLE######
-echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries\n"
+echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries"
 xpoweredby
 if [[ $resourceskip == "y" ]] #skips resource check if flag is given
 then
 	false
 else
-	echo "Now attempting to read the contents of /resources"
 	resourceaccess
 fi
-
-echo -e "\n"
 
 mention 
 ####################
@@ -88,8 +82,7 @@ if [[ $resourceskip == "y" ]] #skips resource check if flag is given
 then
 	false
 else
-	echo "Now attempting to read the contents of /js"
-	#jsfolderaccess
+	jsfolderaccess
 fi
 
 #optional test which depends on whether the site is publicly available or not
@@ -225,6 +218,92 @@ then
 		echo "Host is not using any external JS scripts" >> $file_name
 	fi
 	############################################################################
+
+	echo " " >> $file_name
+
+	##############################RESOURCE ACCESS###############################
+	if [ $resource_folder_accessed ]
+	then
+		echo "Resource folder discovered" >> $file_name
+		if [ $found_js_resource_access ]
+		then
+			echo "Javascript files found inside the resource folder: "$jsfiles >> $file_name
+		else
+			echo "No trace of JavaScript in the resource folder" >> $file_name
+		fi
+		if [ $found_php_resource_access ]
+		then
+			echo "PHP files found inside the resource folder: "$phpfiles >> $file_name
+		else
+			echo "No trace of PHP in the resource folder" >> $file_name
+		fi
+	else
+		echo "Resource folder has not been discovered or is inaccessible by this script" >> $file_name
+	fi
+	############################################################################
+
+	echo " " >> $file_name
+
+	#############################JS ACCESSED####################################
+	if [ $js_folder_accessed ]
+	then
+		if [ $js_in_js_folder ]
+		then
+			echo "JavaScript files found inside the JavaScript folder: "$jsfolderfiles >> $file_name
+		else
+			echo "JavaScript folder discovered but no traces of JavaScript" >> $file_name
+		fi
+	else
+		echo "JavaScript folder has not been discovered or is inaccessible by this script" >> $file_name
+	fi
+	############################################################################
+
+	echo " " >> $file_name
+
+	##################################MENTION###################################
+	if [ $source_code_accessible ]
+	then
+		if [ $mention_js ]
+		then
+			echo "JavaScript mentioned in source code: "${js_array_refined[@]} >> $file_name
+		else
+			echo "No traces of JavaScript in source code" >> $file_name
+		fi
+		if [ $mention_php_flag ]
+		then
+			echo "PHP mentioned in source code: "${php_array[@]} >> $file_name
+		else
+			echo "No traces of PHP in source code" >> $file_name
+		fi
+		if [ $mention_asp_flag ]
+		then
+			echo "ASP mentioned in source code: "${asp_array[@]} >> $file_name
+		else
+			echo "No traces of ASP in source code" >> $file_name
+		fi
+	else
+		echo "Source code could not be read"
+	fi
+	##########################################################################
+
+	echo " " >> $file_name
+
+	#################################PHP######################################
+	if [ $found_phpinfo ]
+	then
+		echo "phpinfo.php discovered at {host}/phpinfo.php" >> $file_name
+	else
+		echo "phpinfo.php undetected/inaccessible" >> $file_name
+	fi
+	if [ $found_phpmyadmin ]
+	then
+		echo "phpmyadmin discovered at {host}/phpmyadmin" >> $file_name
+	else
+		echo "phpmyadmin undetected/inaccessible" >> $file_name
+	fi
+	###########################################################################
+
+
 else
 	echo "End of script"
 fi

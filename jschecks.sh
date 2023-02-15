@@ -38,7 +38,7 @@ jsfolderaccess() {
 
 	#Attempt to read all from /js
 
-	#200 if this folder exists, 404 if not. Check before it reads contents
+	#200 if this folder exists
 	if [[ $publicsite == "y" ]]
 	then
 		returncode=$(curl -sI -L https://$host/js/ | grep "HTTP" | awk '{print $2}')
@@ -65,16 +65,18 @@ jsfolderaccess() {
 			fi
 		else
 			#grep mention of javascript then get the wordcount of that. 0 if nothing is found
+			js_folder_accessed=true
 			curl -s -o JSfolder.txt $host/js/ 
 			jsfolderfiles=$(grep -o -P 'href=.*\.js(?=">)' JSfolder.txt | sed 's/href="//')
 			jsfolderfiles_wc=$(echo $jsfolderfiles | wc -w)
 			rm JSfolder.txt
-
+	
 			if [[ $jsfolderfiles_wc == 0 ]]
 			then
 				echo -e "\nJS folder found but no mention of JavaScript found"
 				echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
 			else
+				js_in_js_folder=true
 				echo -e "\nJS identified in the JS folder"
 				echo "Below are all the discovered files in /js that contain the .js extension:"
 				#echo $jsfolderfiles
@@ -91,7 +93,6 @@ jsfolderaccess() {
 				#echo ${allfiles[@]}
 				#echo $jsfolderfiles
 				echo -e "\nNote: These are only the scripts used on the host, they may not contain any indication of vulnerability or version number(s)"
-				found_js=true
 			fi
 		fi
 	fi

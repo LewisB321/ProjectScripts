@@ -20,6 +20,7 @@ mention(){
 		echo "Could not read host's source code"
 		return 0
 	else
+		source_code_accessible=true
 		mention_JavaScript
 		mention_php
 		mention_asp
@@ -37,10 +38,10 @@ mention_JavaScript(){
 		echo "No mention of JavaScript in source code"
 		return 0
 	else
-		found_js=true
+		mention_js=true
 	fi
 
-	js_filtered=$(echo $webpage | grep -oE 'src=".+\.js">')
+	js_filtered=$(echo $webpage | grep -o 'src=[^<]*</script>')
 	#array to add every JS element
 	js_array_refined=()
 
@@ -48,21 +49,20 @@ mention_JavaScript(){
 	js_filtered=$(echo $js_filtered | sed 's/[[:space:]]*$//')
 	IFS=' ' read -a js_array <<< $js_filtered
 	echo "Every mention of a JS file found in the host's source code:"
-	unset '${js_array[1]}'
+
 	for element in ${js_array[@]}
 	do
 		if echo $element | grep -q ".js" #if element contains the substring .js
 		then
-			#get the output but remove unecessary characters
-			add_to_array=$(echo $element | sed 's/^src="//' | sed 's#"></script><script$##')
-			add_to_array=$(echo $add_to_array | tr -d '">')
+			#get the output but remove unecessary characters (1: The source 2: the start of script 3: the end of script)
+			add_to_array=$(echo $element | sed 's/^src="//' | sed 's#"></script><script$##' | sed 's#"></script>#\n#')
 			echo $add_to_array
 			js_array_refined+=($add_to_array)
 		else
 			false
 		fi
 	done
-
+	echo "Note: Not every mention is going to disclose a script and some detections may not be understandable"
 	#final array with everything in
 	#echo ${js_array_refined[@]}
 }
@@ -70,7 +70,7 @@ mention_JavaScript(){
 
 mention_php(){
 
-	mention_php=$(echo $webpage | grep -i '.php')
+	mention_php=$(echo $webpage | grep -o "\.php") #\ is because . is a special character and won't be used literally
 	mention_php_wc=$(echo $mention_php | wc -w)
 	#echo $mention_php
 	if [[ $mention_php_wc == 0 ]]
@@ -78,7 +78,7 @@ mention_php(){
 		echo "No mention of PHP in source code"
 		return 0
 	else
-		found_php=true
+		mention_php_flag=true
 	fi
 
 	#php_filtered will contain every instance of a string with the .php file extension
@@ -87,6 +87,7 @@ mention_php(){
 	#Removing the whitespace using sed substitution & Putting into the array
 	php_filtered=$(echo $php_filtered | sed 's/[[:space:]]*$//')
 	IFS=' ' read -ra php_array <<< $php_filtered
+
 	echo "Every trace of PHP found in the host's source code:"
 	for element in ${php_array[@]}
 	do
@@ -112,7 +113,7 @@ mention_asp(){
 		echo "No mention of ASP.NET in source code"
 		return 0
 	else
-		found_asp=true
+		mention_asp_flag=true
 	fi
 
 
