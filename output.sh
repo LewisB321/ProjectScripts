@@ -156,7 +156,7 @@ output() {
 			echo "No traces of ASP in source code" >> $file_name
 		fi
 	else
-		echo "Source code could not be read"
+		echo "Source code could not be read" >> $file_name
 	fi
 	##########################################################################
 
@@ -188,4 +188,19 @@ output() {
 		echo "eTag header not present" >> $file_name
 	fi
 	###########################################################################
+	
+	echo " " >> $file_name
+	
+	###########################CROSS DOMAIN SCRIPTS############################
+	if [ $http_referer_successful ]
+	then
+		echo "Third party scripts discovered:" >> $file_name
+		echo ${nmap_results_array[@]} >> $file_name
+		echo "Note: Using third party scripts is generally not advantageous for security purposes" >> $file_name
+		echo "It's much better to include them locally to reduce third-party compromise" >> $file_name
+	else
+		echo "Host is not using third party scripts" >> $file_name
+	fi
+	#############################################################################
+	
 }

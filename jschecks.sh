@@ -7,16 +7,16 @@ nmapscript_referer(){
 	if echo $host | grep -q ':'
 	then
 		temp_host=$(echo $host | grep -oP '(.*?)\:' | sed 's/://')
-		nmap_scan=$(nmap -p80,443 --script http-referer-checker.nse $temp_host)
+		nmap -o nmap_script_output.txt -p80,443 --script http-referer-checker.nse $temp_host >/dev/null
 	else
-		nmap_scan=$(nmap -p80,443 --script http-referer-checker.nse $host)
+		nmap -o nmap_script_output.txt -p80,443 --script http-referer-checker.nse $host >/dev/null
 	fi
 
 	#used to store wordcount
-	test_nmap=$(echo $nmap_scan | grep "Couldn't find any cross-domain scripts" | wc -w)
+	test_nmap=$(cat nmap_script_output.txt | grep "Couldn't find any cross-domain scripts" | wc -w)
 	if [[ $test_nmap == 0 ]]
 	then
-		test_nmap=$(echo $nmap_scan | grep -i "Closed" | wc -w)
+		test_nmap=$(cat nmap_script_output.txt | grep -i "Closed" | wc -w)
 	else
 		false
 	fi
@@ -25,11 +25,19 @@ nmapscript_referer(){
 	#variable will be empty if nothing was found
 	if [[ $test_nmap != 0 ]]
 	then
-		echo -e "\nHost is not using any Cross-Domain JS scripts"
+		echo "Host is not using any Cross-Domain JS scripts"
 	else
-		echo -e "\nFourth test (nmap http-referer script) was potentially successful"
-		#must tidy up???
-		echo "Raw nmap script output: " $nmap_scan
+		echo "Fourth test (nmap http-referer script) was successful"
+		echo "Here are the cross-domains scripts found on the host: " 
+		
+		#Grepping any/all scripts, putting into an array and printing them
+		nmap_results_var=$( cat nmap_script_output.txt | grep -o -E "https?://\S+")
+		nmap_results_var=$( echo $nmap_results_var | sed 's/[[:space:]]*$//')
+		IFS=' ' read -a nmap_results_array <<< $nmap_results_var
+		for element in ${nmap_results_array[@]}
+		do
+			echo $element
+		done
 		http_referer_successful=true
 	fi
 }

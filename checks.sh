@@ -24,7 +24,8 @@ do
 
 	esac
 done
-wappalyzer
+nmapscript_referer
+output
 exit
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. Please contact" 
