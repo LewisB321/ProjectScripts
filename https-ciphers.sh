@@ -2,11 +2,8 @@
 
 enum_ciphers(){
 	
-	#This test will use nmap to determine the encryption algorithms used on the remote host
+	#This test will use nmap to determine the encryption algorithms used on host
 	nmap --script ssl-enum-ciphers -p 443 -oN nmapoutput.txt $host >/dev/null
-
-	#full_list=$(nmap --script ssl-enum-ciphers -p 443 $host)
-	#echo $full_list
 
 	#to catch the failed to resolve hostname error if nmap can't understand the hostname
 	failed_to_resolve=$(cat nmapoutput.txt | grep -w "0 IP addresses")
@@ -21,10 +18,8 @@ enum_ciphers(){
 	
 
 	#condition if the hostname is invalid and the ciphers cannot be read
-	if [[ $failed_to_resolve_wc != 0 ]]
-	then
+	if [[ $failed_to_resolve_wc != 0 ]];then
 		echo "Hostname invalid. Please check again & ensure that host is online"
-		#return 0 will end prematurely and ensure that the the function is exited before the next check takes place
 		return 0
 	else
 		#this stays doing nothing since a valid host will be here and trigger echo_results twice if I place it
@@ -35,11 +30,11 @@ enum_ciphers(){
 	#condition if the hostname is valid but host is blocking the nmap probe. Will activitae an internal flag
 	#so that the function will try the second method of enumerating ciphersuites
 	#else statement here is different as it calls the first function to output important info
-	if [[ $host_is_down_wc != 0 ]]
-	then
+	if [[ $host_is_down_wc != 0 ]];then
 		echo "Host doesn't seem to be responding to an attempt to enumerate ciphersuite. Please attempt to manually validate and try again"
 		return 0
 	else
+		ciphers_found=true
 		echo_results
 	fi
 
@@ -74,11 +69,14 @@ echo_results() {
 	do
 		for ((j=0;j<$len2;j++))
 		do
-			if [ $i -eq $j ]
-			then
+			if [ $i -eq $j ];then
 				echo "Remote host has" ${count_array[j]} "instances of" ${grade_array[i]} "grade cipher(s)"
 			fi
 		done
 	done
+
+	cipher_file_name=$host"_"$timestamp"Cipher_Analysis.txt"
+	cat nmapoutput.txt > $cipher_file_name
+	rm nmapoutput.txt
 
 }

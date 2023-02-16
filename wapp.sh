@@ -6,13 +6,12 @@ wappalyzer(){
 	#the custom API key is free but limited use
 
 	#comment the below when not using
-	wappresults=$(curl -sH "x-api-key: re6fXaDu8j3lGWOYV1jOs4FnkTtvZS0BSyLCOjid" "https://api.wappalyzer.com/lookup/v1/?url=https://$host")
+	wappresults=$(curl -sH "x-api-key: qAe3PQDDon82u8ZXyDLBQ7Cn9lb1AcCJ7iGyNPZh" "https://api.wappalyzer.com/lookup/v1/?url=https://$host")
 
 
 	#the api call will return invalid if the remote host can't be found. This if statement is to determine this
 	#and only print the output if the test was successful
-	if echo $wappresults | grep -q "Invalid"
-	then
+	if echo $wappresults | grep -q "Invalid";then
 		echo -e "\nWappalyzer test unsuccessful. It's very likely that the host could not be queried or the API key has ran out"
 	else
 		#read the raw output from the API into an array seperated by commas
@@ -20,7 +19,7 @@ wappalyzer(){
 		#prints the array. Must find a way to clean this up
 		echo "Wappalyzer test successful. Output is too large for the command line. Please refer to the text file"
 		echo "An error has occured if the text file is empty"
-		#echo "Raw Wappalyzer output: " ${wapparray[@]}
+		echo "Raw Wappalyzer output: " ${wapparray[@]}
 	fi
 	
 	
@@ -147,4 +146,55 @@ wap_programming_language_check(){
 	sed '/Programming/{N; s/\n/ /};' temp.txt > programming_languages_wap.txt
 	rm pl_wap.txt
 	rm temp.txt
+}
+
+wap_webserver_check(){
+	webserver_array=()
+	touch ws_temp.txt
+	touch temp.txt
+	touch webserver_wap.txt
+	for ((i=0; i<=${#wapparray[@]}; i++));do
+	if [[ ${wapparray[i]} =~ .*servers.* ]]
+	then
+		echo ${wapparray[i]}
+		webserver_array+=(${wapparray[i]})
+		for ((a=1; a<=10; a++))
+		do
+			if [[ ${wapparray[i-a]} =~ .*categories.* ]]
+			then
+				break
+			else	
+				echo ${wapparray[i-a]}
+				webserver_array+=(${wapparray[i-a]})
+			fi
+		done
+	else
+		false
+	fi
+	done
+
+	#quick check to see if anything's been returned under a Programming Languages header
+	if [ ${#webserver_array[@]} -eq 0 ]
+	then
+		echo "No web server discovered by Wappalyzer"
+	else
+		wap_found_webserver=true
+	fi
+
+	for (( i=0; i<=${#webserver_array[@]}; i++ ))
+	do
+	if [[ "${webserver_array[$i]}" == *"hits"* ]]
+	then
+		unset 'webserver_array[$i]'
+	fi
+	done
+
+
+	for elem in "${webserver_array[@]}"
+	do
+		echo "$elem" | tr -d '"{}' >> ws_temp.txt
+	done
+
+	#sed '/^$/d; /\bname\b/{N; s/\n\(.*categories\)/\n\n\1/};' pl_wap.txt > temp.txt
+	#sed '/Programming/{N; s/\n/ /};' temp.txt > programming_languages_wap.txt
 }

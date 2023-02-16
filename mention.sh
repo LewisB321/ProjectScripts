@@ -3,11 +3,7 @@
 mention(){
 
 	#Grep returned source code for mention of JavaScript, PHP or ASP.NET
-
-
-	#add https to hostname before check if site is public
-	if [[ $publicsite == 'y' ]]
-	then
+	if [[ $publicsite == 'y' ]];then
 		webpage=$(curl -sL https://$host)
 	else
 		webpage=$(curl -sL http://$host)
@@ -15,8 +11,7 @@ mention(){
 	
 	webpage_wc=$(echo $webpage | wc -w)
 
-	if [[ $webpage_wc == 0 ]]
-	then
+	if [[ $webpage_wc == 0 ]];then
 		echo "Could not read host's source code"
 		return 0
 	else
@@ -32,9 +27,8 @@ mention_JavaScript(){
 
 	mention_js=$(echo $webpage | grep -i 'script type="text/javascript"')
 	mention_js_wc=$(echo $mention_js | wc -w)
-	#echo $mention_js
-	if [[ $mention_js_wc == 0 ]]
-	then
+	
+	if [[ $mention_js_wc == 0 ]];then
 		echo "No mention of JavaScript in source code"
 		return 0
 	else
@@ -52,8 +46,7 @@ mention_JavaScript(){
 
 	for element in ${js_array[@]}
 	do
-		if echo $element | grep -q ".js" #if element contains the substring .js
-		then
+		if echo $element | grep -q ".js";then #if element contains the substring .js
 			#get the output but remove unecessary characters (1: The source 2: the start of script 3: the end of script)
 			add_to_array=$(echo $element | sed 's/^src="//' | sed 's#"></script><script$##' | sed 's#"></script>#\n#')
 			echo $add_to_array
@@ -72,9 +65,8 @@ mention_php(){
 
 	mention_php=$(echo $webpage | grep -o "\.php") #\ is because . is a special character and won't be used literally
 	mention_php_wc=$(echo $mention_php | wc -w)
-	#echo $mention_php
-	if [[ $mention_php_wc == 0 ]]
-	then
+
+	if [[ $mention_php_wc == 0 ]];then
 		echo "No mention of PHP in source code"
 		return 0
 	else
@@ -108,8 +100,7 @@ mention_asp(){
 	mention_asp=$(echo $webpage | grep -io -f mention_asp.txt)
 	mention_asp_wc=$(echo $mention_asp | wc -w)
 	rm mention_asp.txt
-	if [[ $mention_asp_wc == 0 ]]
-	then
+	if [[ $mention_asp_wc == 0 ]];then
 		echo "No mention of ASP.NET in source code"
 		return 0
 	else

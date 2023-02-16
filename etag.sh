@@ -3,16 +3,14 @@
 etag_check(){
 
 	#simple check for presence of eTag header
-	if [[ $publicsite == 'y' ]]
-	then
+	if [[ $publicsite == 'y' ]];then
 	header_contents=$(curl -sI -L https://"$host" | grep -i "eTag")
 	else
 	header_contents=$(curl -sI -L http://"$host" | grep -i "eTag")
 	fi
 
 	etag_present=$(echo $header_contents | grep -i "eTag" | wc -w)
-	if [[ $etag_present == 0 ]]
-	then
+	if [[ $etag_present == 0 ]];then
 		echo "eTag header not present"
 	else
 		echo "eTag header present"

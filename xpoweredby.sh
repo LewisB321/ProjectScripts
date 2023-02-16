@@ -3,8 +3,7 @@
 xpoweredby(){
 
 	#Try to retrieve x-powered-by header information. Conditional statement for public host
-	if [[ $publicsite == 'y' ]]
-	then
+	if [[ $publicsite == 'y' ]];then
 		Header_Data=$(curl -sI -L https://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
 		asp_extra_check=$(curl -sI -L https://"$host" | grep -i "x-aspnet" | awk '{$1=""}1')
 	else
@@ -16,8 +15,7 @@ xpoweredby(){
 	#echo $Header_Data
 
 	#variable empty if header not there
-	if [[ $test_xpb == 0 ]]
-	then
+	if [[ $test_xpb == 0 ]];then
 		echo -e "\nX-Powered-By header not present"
 	else
 		echo -e "\nX-Powered-By header present. Attempting to discover technologies\n"
@@ -37,12 +35,10 @@ aspcheck(){
 	asp_check=$(echo $Header_Data | grep -i "ASP.NET")
 	asp_check_wc=$(echo $asp_check | wc -w)
 	asp_extra_check_wc=$(echo $asp_extra_check | wc -w)
-	if [[ $asp_check_wc == 0 ]]
-	then
+	if [[ $asp_check_wc == 0 ]];then
 		echo "ASP.NET undiscovered by header data"
 	else
-		if [[ $asp_extra_check_wc == 0 ]]
-		then
+		if [[ $asp_extra_check_wc == 0 ]];then
 			echo "ASP.NET discovered on host but no version identified"
 			found_asp_no_version_xpb=true
 		else
@@ -58,8 +54,7 @@ phpcheck(){
 	php_check=$(echo $Header_Data | grep -i "PHP")
 	php_check=$(echo $php_check | grep -o "^[^-]*")
 	php_check_wc=$(echo $php_check | wc -w)
-	if [[ $php_check_wc == 0 ]]
-	then
+	if [[ $php_check_wc == 0 ]];then
 		echo "PHP undiscovered by header data"
 	else
 		echo "PHP version discovered on host:"$php_check
@@ -83,8 +78,7 @@ jscheck(){
 
 	js_check=$(echo $Header_Data | grep -i -f jschecklist)
 	js_check_wc=$(echo $js_check | wc -w)
-	if [[ $js_check_wc == 0 ]]
-	then
+	if [[ $js_check_wc == 0 ]];then
 		echo "JavaScript undiscovered by header data"
 	else
 		echo "JavaScript libraries/frameworks discovered on host: "$js_check
@@ -101,8 +95,7 @@ frameworkcheck(){
 
 	framework_check=$(echo $Header_Data | grep -i -f frameworkchecklist)
 	framework_check_wc=$(echo $framework_check | wc -w)
-	if [[ $framework_check_wc == 0 ]]
-	then
+	if [[ $framework_check_wc == 0 ]];then
 		echo "Application framework undiscovered by header data"
 	else
 		echo "Application framework discovered on host:"$framework_check

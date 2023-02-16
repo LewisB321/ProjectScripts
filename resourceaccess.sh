@@ -4,8 +4,7 @@
 resourceaccess() {
 
 	#Attempt to access and read contents of /access
-	if [[ $publicsite == "y" ]]
-	then
+	if [[ $publicsite == "y" ]];then
 		returncode=$(curl -sI -L https://www.$host/resources/ | grep "HTTP" | awk '{print $2}')
 		indexpage=$(curl -sI -L https://$host | wc -c)	
 		resourcefolder=$(curl -sI -L https://$host/resources | wc -c)
@@ -17,12 +16,10 @@ resourceaccess() {
 
 
 	#silent direct checker
-	if [ $indexpage -eq $resourcefolder ]
-	then
+	if [ $indexpage -eq $resourcefolder ];then
 		echo "Silent redirect detected when attempting to access /resources"
 	else
-		if [[ ! $returncode =~ 200 ]]
-		then
+		if [[ ! $returncode =~ 200 ]];then
 			echo -e "\nResources folder not present"
 		else
 			echo -e "\n/resources folder found"
@@ -31,8 +28,7 @@ resourceaccess() {
 			resource_folder_accessed=true
 
 			#output the contents to a txt file to preserve html format
-			if [[ $publicsite == "y" ]]
-			then
+			if [[ $publicsite == "y" ]];then
 				curl -s -o ra.txt https://www.$host/resources/ 
 			else
 				curl -s -o ra.txt http://$host/resources/ 
@@ -53,8 +49,7 @@ ra_js() {
 	jsfiles=$(cat ra.txt | grep -o -P 'href.*.js(?=">)' | sed 's/href="//')
 	jsfile_wc=$(echo $jsfiles | wc -w)
 	#decides whether anything with the .js extension has been found
-	if [[ $jsfile_wc == 0 ]]
-	then
+	if [[ $jsfile_wc == 0 ]];then
 		echo -e "\nNo traces of JavaScript in /resources"
 	else
 		echo -e "\nJS identified in the resource folder"
@@ -71,8 +66,7 @@ ra_php() {
 	phpfiles_wc=$(echo $phpfiles | wc -w)
 		
 	#decides whether anything with the .js extension has been found
-	if [[ $phpfiles_wc == 0 ]]
-	then
+	if [[ $phpfiles_wc == 0 ]];then
 		echo -e "\nNo traces of PHP in /resources"
 	else
 		echo -e "\nPHP identified in the resource folder"
