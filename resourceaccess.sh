@@ -53,7 +53,12 @@ ra_js() {
 		echo -e "\nNo traces of JavaScript in /resources"
 	else
 		echo -e "\nJS identified in the resource folder"
-		echo $jsfiles
+		jsfiles=$(echo $jsfiles | sed 's/[[:space:]]*$//')
+		IFS=' ' read -a jsfiles_array <<< $jsfiles
+		for element in ${jsfiles_array[@]};do
+			echo $element
+		done
+		declare -x jsfiles_array #exporting so output.sh can read
 		echo -e "\nNote: May not contain any indication of vulnerability"
 		found_js_resource_access=true
 	fi
@@ -70,7 +75,12 @@ ra_php() {
 		echo -e "\nNo traces of PHP in /resources"
 	else
 		echo -e "\nPHP identified in the resource folder"
-		echo $phpfiles
+		phpfiles=$(echo $phpfiles | sed 's/[[:space:]]*$//')
+		IFS=' ' read -a phpfiles_array <<< $phpfiles
+		for element in ${phpfiles_array[@]};do
+			echo $element
+		done
+		declare -x phpfiles_array #exporting so output.sh can read
 		echo -e "\nNote: May not contain any indication of vulnerability"
 		found_php_resource_access=true
 	fi

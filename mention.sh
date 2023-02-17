@@ -55,6 +55,7 @@ mention_JavaScript(){
 			false
 		fi
 	done
+	declare -x js_array_refined
 	echo "Note: Not every mention is going to disclose a script and some detections may not be understandable"
 	#final array with everything in
 	#echo ${js_array_refined[@]}
@@ -85,6 +86,7 @@ mention_php(){
 	do
 		echo $element
 	done
+	declare -x php_array
 
 	
 }
@@ -115,5 +117,6 @@ mention_asp(){
 	do
 		echo $element
 	done
+	declare -x asp_array
 
 }

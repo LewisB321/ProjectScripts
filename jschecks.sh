@@ -35,6 +35,7 @@ nmapscript_referer(){
 		do
 			echo $element
 		done
+		declare -x nmap_results_array
 		http_referer_successful=true
 	fi
 }
@@ -87,6 +88,7 @@ jsfolderaccess() {
 				do
 					echo $element
 				done
+				declare -x allfiles
 
 				echo -e "\nNote: These are only the scripts used on the host, they may not contain any indication of vulnerability or version number(s)"
 			fi

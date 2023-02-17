@@ -74,26 +74,22 @@ output() {
 
 	echo " " >> $file_name
 
-	################################http_referer################################
-	if [ $http_referer_successful ];then
-		echo "Successful nmap script placeholder" >> $file_name
-	else
-		echo "Host is not using any external JS scripts" >> $file_name
-	fi
-	############################################################################
-
-	echo " " >> $file_name
-
 	##############################RESOURCE ACCESS###############################
 	if [ $resource_folder_accessed ];then
 		echo "Resource folder discovered" >> $file_name
 		if [ $found_js_resource_access ];then
-			echo "Javascript files found inside the resource folder: "$jsfiles >> $file_name
+			echo "Javascript files found inside the resource folder: " >> $file_name
+			for element in ${jsfiles_array[@]};do
+				echo $element >> $file_name
+			done
 		else
 			echo "No trace of JavaScript in the resource folder" >> $file_name
 		fi
 		if [ $found_php_resource_access ];then
-			echo "PHP files found inside the resource folder: "$phpfiles >> $file_name
+			echo "PHP files found inside the resource folder: " >> $file_name
+			for element in ${phpfiles_array[@]};do
+				echo $element >> $file_name
+			done
 		else
 			echo "No trace of PHP in the resource folder" >> $file_name
 		fi
@@ -107,7 +103,10 @@ output() {
 	#############################JS ACCESSED####################################
 	if [ $js_folder_accessed ];then
 		if [ $js_in_js_folder ];then
-			echo "JavaScript files found inside the JavaScript folder: "$jsfolderfiles >> $file_name
+			echo "JavaScript files found inside the JavaScript folder: " >> $file_name
+			for element in ${allfiles[@]};do
+				echo $element >> $file_name
+			done
 		else
 			echo "JavaScript folder discovered but no traces of JavaScript" >> $file_name
 		fi
@@ -121,17 +120,26 @@ output() {
 	##################################MENTION###################################
 	if [ $source_code_accessible ];then
 		if [ $mention_js ];then
-			echo "JavaScript mentioned in source code: "${js_array_refined[@]} >> $file_name
+			echo "JavaScript mentioned in source code: " >> $file_name
+			for element in ${js_array_refined[@]};do
+				echo $element >> $file_name
+			done
 		else
 			echo "No traces of JavaScript in source code" >> $file_name
 		fi
 		if [ $mention_php_flag ];then
-			echo "PHP mentioned in source code: "${php_array[@]} >> $file_name
+			echo "PHP mentioned in source code: " >> $file_name
+			for element in ${php_array[@]};do
+				echo $element >> $file_name
+			done
 		else
 			echo "No traces of PHP in source code" >> $file_name
 		fi
 		if [ $mention_asp_flag ];then
-			echo "ASP mentioned in source code: "${asp_array[@]} >> $file_name
+			echo "ASP mentioned in source code: " >> $file_name
+			for element in ${asp_array[@]};do
+				echo $element >> $file_name
+			done
 		else
 			echo "No traces of ASP in source code" >> $file_name
 		fi
@@ -171,7 +179,9 @@ output() {
 	###########################CROSS DOMAIN SCRIPTS############################
 	if [ $http_referer_successful ];then
 		echo "Third party scripts discovered:" >> $file_name
-		echo ${nmap_results_array[@]} >> $file_name
+		for element in ${nmap_results_array[@]};do
+			echo $element >> $file_name
+		done
 		echo "Note: Using third party scripts is generally not advantageous for security purposes" >> $file_name
 		echo "It's much better to include them locally to reduce third-party compromise" >> $file_name
 	else

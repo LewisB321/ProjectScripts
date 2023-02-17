@@ -25,7 +25,9 @@ do
 
 	esac
 done
+wappalyzer
 
+exit
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. Please contact" 
 echo "lewisblythe0121@gmail.com if something doesn't work"
