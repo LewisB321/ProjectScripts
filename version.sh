@@ -7,7 +7,6 @@ latest_version_nginx="nginx/1.23.3"
 latest_version_gunicorn="gunicorn/20.1.0"
 latest_version_iis="Microsoft-IIS/10.0"
 
-#standard public check
 if [[ $publicsite == 'y' ]];then
 	version=$(curl -sI -L https://"$host" | grep -m 1 -iw "Server:" | awk '{print $2}')
 else
@@ -73,9 +72,6 @@ fi
 #based on the correct software
 if [[ $has_version == true ]];then
 
-	#charcount is used because I needed to remove the newline character from $version in order to compare it 
-	#to the hardcoded latest version that I have
-	charcount_1=$(echo -n $version | wc -c)
 	if [[ $is_apache == true ]];then
 		apache_ver_check
 	else
@@ -103,7 +99,7 @@ fi
 
 #placed the check code inside of their own functions to help with scalability if necessary
 apache_ver_check() {
-	apache=$(echo -n $version)
+	apache=$(echo -n $version | tr -d '[:space:]')
 	if [[ $latest_version_apache == $apache ]];then
 		echo "Latest Apache version identified"
 		webservlatest=true
@@ -115,7 +111,7 @@ apache_ver_check() {
 }
 
 nginx_ver_check() {
-	nginx=$(echo -n $version)
+	nginx=$(echo -n $version | tr -d '[:space:]')
 	if [[ $latest_version_nginx == $nginx ]];then
 		echo "Latest nginx version identified"
 		webservlatest=true
@@ -127,7 +123,7 @@ nginx_ver_check() {
 }
 
 gunicorn_ver_check() {
-	gun=$(echo -n $version)
+	gun=$(echo -n $version | tr -d '[:space:]')
 	if [[ $latest_version_gunicorn == $gun ]];then
 		echo "Latest gunicorn version identified"
 		webservlatest=true
@@ -139,7 +135,7 @@ gunicorn_ver_check() {
 }
 
 iis_ver_check() {
-	iis=$(echo -n $version)
+	iis=$(echo -n $version | tr -d '[:space:]')
 	if [[ $latest_version_iis == $iis ]];then
 		echo "Latest IIS version identified"
 		webservlatest=true

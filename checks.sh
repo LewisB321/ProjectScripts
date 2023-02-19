@@ -12,6 +12,7 @@ source mention.sh
 source wapp.sh
 source etag.sh
 source output.sh
+source securitylookup.sh
 
 #flags to alter script behaviour
 while getopts h:p:f:r:w: flag
@@ -25,13 +26,21 @@ do
 
 	esac
 done
-wappalyzer
 
-exit
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. Please contact" 
 echo "lewisblythe0121@gmail.com if something doesn't work"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+
+if [[ $publicsite == 'y' ]];then
+	response=$(curl -s --fail https://$host 2>/dev/null)
+	exit_code=$?
+	if [[ $exit_code == 35 ]];then
+		echo "Host is refusing certain curl connections, so this script will not behave properly. Stopping script execution"
+		exit
+	fi
+fi
 
 #pingtest for host's availability. Will exit if host is unreachable
 #There are easier ways to check host availability than with ping but I don't have time to change it
