@@ -25,7 +25,6 @@ xpoweredby(){
 		aspcheck
 		phpcheck
 		jscheck
-		echo -e "\n"
 	fi
 }
 
@@ -42,6 +41,7 @@ aspcheck(){
 			echo "ASP.NET discovered on host but no version identified"
 			found_asp_no_version_xpb=true
 		else
+			asp_extra_check="ASP$asp_extra_check"
 			echo "ASP.NET discovered version:"$asp_extra_check
 			found_asp_xpb=true
 		fi
@@ -75,6 +75,8 @@ jscheck(){
 	echo "requireJS" >> jschecklist
 	echo "jquery" >> jschecklist
 	echo "react" >> jschecklist
+	echo "zope" >> jschecklist
+	echo "next" >> jschecklist
 
 	js_check=$(echo $Header_Data | grep -i -f jschecklist)
 	js_check_wc=$(echo $js_check | wc -w)

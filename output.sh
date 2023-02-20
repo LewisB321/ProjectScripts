@@ -5,7 +5,7 @@ output() {
 	timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 	file_name=$host"_"$timestamp".txt"
 	touch $file_name
-	echo "results saved in the file - "$file_name
+	
 
 	###########################WEBSERVER OUTPUT###############################
 	if [ $found_webserver ];then
@@ -69,6 +69,10 @@ output() {
 		else
 			if [ $found_asp_xpb ];then
 				echo "ASP version discovered by XPB Header: "$asp_extra_check >> $file_name
+				software=$(echo $asp_extra_check | grep -io "ASP")
+				version_num=$(echo $asp_extra_check | grep -Eo '[0-9]+\.[0-9]+\.')
+				version_num="${version_num}x"
+				securitylookup $software $version_num $file_name
 			else
 				echo "ASP undiscovered by XPB Header" >> $file_name
 			fi
@@ -76,6 +80,10 @@ output() {
 
 		if [ $found_php_xpb ];then
 			echo "PHP version discovered by XPB Header: "$php_check >> $file_name
+			software=$(echo $Header_Data | grep -io "PHP")
+			version_num=$(echo $Header_Data | grep -Eo '[0-9]+\.[0-9]+\.')
+			version_num="${version_num}x"
+			securitylookup $software $version_num $file_name
 		else
 			echo "PHP undiscovered by XPB Header" >> $file_name
 		fi
@@ -229,6 +237,8 @@ output() {
 	else
 		echo "Ciphersuite unable to be discovered" >> $file_name
 	fi
+	#############################################################################
 
+	echo "results saved in the file - "$file_name
 	
 }

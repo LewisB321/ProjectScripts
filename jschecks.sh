@@ -28,8 +28,8 @@ nmapscript_referer(){
 		echo "Here are the cross-domains scripts found on the host: " 
 		
 		#Grepping any/all scripts, putting into an array and printing them. Sed is used to remove annoying chars
-		nmap_results_var=$( cat nmap_script_output.txt | grep -o -E "https?://\S+")
-		nmap_results_var=$( echo $nmap_results_var | sed 's/[[:space:]]*$//')
+		nmap_results_var=$(cat nmap_script_output.txt | grep -o -E "https?://\S+")
+		nmap_results_var=$(echo $nmap_results_var | sed 's/[[:space:]]*$//')
 		IFS=' ' read -a nmap_results_array <<< $nmap_results_var
 		for element in ${nmap_results_array[@]}
 		do
@@ -38,6 +38,7 @@ nmapscript_referer(){
 		declare -x nmap_results_array
 		http_referer_successful=true
 	fi
+	rm nmap_script_output.txt
 }
 
 jsfolderaccess() {
