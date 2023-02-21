@@ -6,26 +6,29 @@ wappalyzer(){
 	#the custom API key is free but limited use
 
 	#comment the below when not using
-	wappresults=$(curl -sH "x-api-key: FqQpCWs3UN3Ajz8umQRvc2YRnpVTkgXy9hnMAwt4" "https://api.wappalyzer.com/lookup/v2/?url=https://$host")
+	wappresults=$(curl -sH "x-api-key: YHyeImfviK4i1cjlQcSVeQFPjRp6U447lccmIoz8" "https://api.wappalyzer.com/lookup/v1/?url=https://$host")
 
 
 	#the api call will return invalid if the remote host can't be found. This if statement is to determine this
 	#and only print the output if the test was successful
-	if echo $wappresults | grep -q "Invalid";then
+	if echo $wappresults | grep -qE "Invalid|could not be resolved";then
 		echo -e "\nWappalyzer test unsuccessful. It's very likely that the host could not be queried or the API key has ran out"
+		return 0
 	else
 		#read the raw output from the API into an array seperated by commas
+		wap=true
 		IFS=',' read -r -a wapparray <<< $wappresults
 		#prints the array. Must find a way to clean this up
 		echo "Wappalyzer test successful. Output is too large for the command line. Please refer to the text file"
 		echo "An error has occured if the text file is empty"
-		echo "Raw Wappalyzer output: " ${wapparray[@]}
+		#echo "Raw Wappalyzer output: " ${wapparray[@]}
 	fi
 	
 	
 	wap_javascript_check
-	wap_programming_language_check
-	wap_webserver_check
+	#wap_programming_language_check
+	#wap_webserver_check
+
 
 
 
@@ -40,7 +43,7 @@ wap_javascript_check(){
 	#4) use Tr to remove special characters, then output to a text file
 	#5) use sed to tidy the text file up a bit
 	#It's far from perfect but it kind of works
-	touch wap_jstechnologies.txt
+	touch JavaScript_Wappalyzer.txt
 	touch temp.txt
 
 	refined_array=()
@@ -88,9 +91,34 @@ wap_javascript_check(){
 
  	sed '/^$/d; /\bname\b/{N; s/\n\(.*categories\)/\n\n\1/};'  jstechnologies_wap.txt > temp.txt
 
- 	sed '/JavaScript/{N; s/\n/ /};' temp.txt > wap_jstechnologies.txt
+ 	sed '/JavaScript/{N; s/\n/ /};' temp.txt > JavaScript_Wappalyzer.txt
 	rm temp.txt
 	rm jstechnologies_wap.txt
+	
+	
+	#making it appropriate for the cve API lookup
+	touch temp
+	while read line; do
+		if [[ $line == *"name"* ]]; then
+			echo $line | tr -d "[]" | sed 's/name://g' >> temp
+		fi
+		if [[ $line == *"versions"* ]]; then
+			echo $line | tr -d "[]" | sed 's/versions://g' >> temp
+		fi
+	done < JavaScript_Wappalyzer.txt
+	
+	sed -i '/^$/d' temp #removing blank lines
+	
+	touch wap_output_for_security_check
+	
+	while IFS= read -r line; do
+		if [[ $line =~ [0-9] ]]; then
+			next_line=$(IFS= read -r; echo "$REPLY")
+			echo "$next_line $line"
+		fi
+	done < temp > wap_output_for_security_check
+			
+	rm temp
 }
 
 

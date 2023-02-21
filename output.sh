@@ -225,6 +225,26 @@ output() {
 
 	###############################WAPPALYZER####################################
 
+	if [ $wap_found_js ];then
+		echo "wappalyzer scan successful. Here are the important JavaScript technologies:" >> $file_name
+		while read line; do
+			echo $line >> $file_name
+			software=$(echo $line | grep -o '^[^[:space:]]*')
+			version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+')
+			securitylookup $software $version_num $file_name
+		done < wap_output_for_security_check
+		echo "For full results for JavaScript technologies, please refer to [PLACEHOLDER] text file" >> $file_name
+		echo "Note: Any repeating items are the result of the API output. This script does not check for repeated chunks" >> $file_name
+		rm wap_output_for_security_check
+	else
+		if [ $wap ];then
+			echo "Wappalyzer test successful but could not discovere any JavaScript technologies" >> $file_name
+		else
+			echo "Wappalyzer test could not run or bypass flag was given" >> $file_name
+		fi
+	fi
+	
+
 	#############################################################################
 
 	echo " " >> $file_name
@@ -239,6 +259,7 @@ output() {
 	fi
 	#############################################################################
 
+	sed -i '/^Potential associated vulnerabilities: $/d' $file_name
 	echo "results saved in the file - "$file_name
 	
 }
