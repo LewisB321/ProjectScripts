@@ -224,27 +224,79 @@ output() {
 	echo " " >> $file_name
 
 	###############################WAPPALYZER####################################
-
+	
+	if [ $wap ];then
+		echo "Please note that the Wappalyzer API may sometimes misbehave/show varied results. This script is" >> $file_name
+		echo -e "expecting Wappalyzer to return consistently formatted results but this is not always the case\n" >> $file_name
+	fi
 	if [ $wap_found_js ];then
-		echo "wappalyzer scan successful. Here are the important JavaScript technologies:" >> $file_name
-		while read line; do
-			echo $line >> $file_name
-			software=$(echo $line | grep -o '^[^[:space:]]*')
-			version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+')
-			securitylookup $software $version_num $file_name
-		done < wap_output_for_security_check
-		echo "For full results for JavaScript technologies, please refer to [PLACEHOLDER] text file" >> $file_name
-		echo "Note: Any repeating items are the result of the API output. This script does not check for repeated chunks" >> $file_name
-		rm wap_output_for_security_check
+		if grep -q '[0-9]' wap_output_for_security_check_js;then
+			echo "Here are the JS technologies with a version according to Wappalyzer:" >> $file_name
+			while read line; do
+				echo $line >> $file_name
+				software=$(echo $line | grep -o '^[^[:space:]]*')
+				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+')
+				securitylookup $software $version_num $file_name
+			done < wap_output_for_security_check_js
+			echo -e "For the full results of JavaScript technologies, please refer to JavaScript_Wappalyzer.txt\n" >> $file_name
+			rm wap_output_for_security_check_js
+		else
+			echo -e "JavaScript discovered but no version could be identified. Please refer to JavaScript_Wappalyzer.txt\n" >> $file_name
+		fi
 	else
 		if [ $wap ];then
-			echo "Wappalyzer test successful but could not discovere any JavaScript technologies" >> $file_name
+			echo -e "Wappalyzer test successful but could not discover any JavaScript technologies\n" >> $file_name
 		else
-			echo "Wappalyzer test could not run or bypass flag was given" >> $file_name
+			echo -e "Wappalyzer test could not run or bypass flag was given\n" >> $file_name
 		fi
 	fi
 	
-
+	if [ $wap_found_prog_language ];then
+		if grep -q '[0-9]' wap_output_for_security_check_pl;then
+			echo "Here are the Programming Lanaguages with a version according to Wappalyzer:" >> $file_name
+			while read line; do
+				echo $line >> $file_name
+				software=$(echo $line | grep -o '^[^[:space:]]*')
+				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+\.')
+				version_num="${version_num}x"
+				securitylookup $software $version_num $file_name
+			done < wap_output_for_security_check_pl
+			echo -e "For the full results of Programming Languages, please refer to Languages_Wappalyzer.txt\n" >> $file_name
+			rm wap_output_for_security_check_pl
+		else
+			echo -e "Programming Languages discovered but contain no version number. Please refer to Languages_Wappalyzer.txt\n" >> $file_name
+		fi
+		
+	else
+		if [ $wap ];then
+			echo -e "No Programming Languages discovered by Wappalyzer\n" >> $file_name
+		fi
+	fi
+	
+	if [ $wap_found_webserver ];then
+		if grep -q '[0-9]' wap_output_for_security_check_ws;then
+			echo "Webserver Software according to Wappalyzer:" >> $file_name
+			while read line; do
+				echo $line >> $file_name
+				software=$(echo $line | grep -o '^[^[:space:]]*')
+				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+\.')
+				version_num="${version_num}x"
+				securitylookup $software $version_num $file_name
+			done < wap_output_for_security_check_ws
+			echo "If this information conflicts with the first test it's likely that this is more reliable" >> $file_name
+			rm wap_output_for_security_check_ws #no security test conducted on this for data cleaning reasons		
+		else
+			ws_wc=$(cat wap_output_for_security_check_ws | wc -w)
+			if [[ $ws_wc != 0 ]];then
+				echo "Webserver Software discovered by Wappalyzer but no version given. Please refer to Webserver_Wappalyzer.txt"
+			else
+				if [ $wap ];then
+				echo "No Webserver Software discovered by Wappalyzer" >> $file_name
+				fi
+			fi
+		fi
+	fi
+	
 	#############################################################################
 
 	echo " " >> $file_name

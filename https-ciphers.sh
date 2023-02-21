@@ -47,7 +47,7 @@ echo_results() {
 	echo -e "\nThe encryption strength of the remote host is:" $grade
 	echo "This grade represents the security strength of the weakest cipher algorithm in all available cipher suites"
 	echo "The grading system used is extracted from the SSL Labs Server Rating Guide, available at https://www.ssllabs.com/projects/rating-guide"
-	echo -e "For a full list of returned output, Please refer to the outputted text file\n"	
+	echo -e "For a full list of returned output, Please refer to "$host"_Cipher_Analysis.txt\n"	
 
 	#couldn't determine a working method to iterate this
 	A_count=$(cat nmapoutput.txt | grep '\sA' | wc -l)

@@ -19,15 +19,14 @@ wappalyzer(){
 		wap=true
 		IFS=',' read -r -a wapparray <<< $wappresults
 		#prints the array. Must find a way to clean this up
-		echo "Wappalyzer test successful. Output is too large for the command line. Please refer to the text file"
-		echo "An error has occured if the text file is empty"
+		echo -e "\nWappalyzer test successful. Output is too large for the command line. Please refer to the text files"
 		#echo "Raw Wappalyzer output: " ${wapparray[@]}
 	fi
 	
 	
 	wap_javascript_check
-	#wap_programming_language_check
-	#wap_webserver_check
+	wap_programming_language_check
+	wap_webserver_check
 
 
 
@@ -35,14 +34,7 @@ wappalyzer(){
 }
 
 wap_javascript_check(){
-	#the following ungodly chunk of code is aimed at trying to narrow down the raw wappalyzer output to pick out any JavaScript related entities and print them
-	#as well as store them inside their own text file. The syntax is awkward but goes like this:
-	#1) read each element to see if it contains the substring JavaScript
-	#2) if so, begin adding each prior element until it reaches the next "category"
-	#3) Parse once again to remove lines with the substring "Hits"
-	#4) use Tr to remove special characters, then output to a text file
-	#5) use sed to tidy the text file up a bit
-	#It's far from perfect but it kind of works
+
 	touch JavaScript_Wappalyzer.txt
 	touch temp.txt
 
@@ -51,7 +43,7 @@ wap_javascript_check(){
 	for ((i=0; i<=${#wapparray[@]}; i++));do
 		if [[ ${wapparray[i]} =~ .*JavaScript.* ]]
 		then
-			echo ${wapparray[i]}
+			#echo ${wapparray[i]}
 			refined_array+=(${wapparray[i]})
 			for ((a=1; a<=10; a++))
 			do
@@ -59,7 +51,7 @@ wap_javascript_check(){
 				then
 					break
 				else	
-					echo ${wapparray[i-a]}
+					#echo ${wapparray[i-a]}
 					refined_array+=(${wapparray[i-a]})
 				fi
 			done
@@ -71,7 +63,7 @@ wap_javascript_check(){
 	#quick check to see if anything's been returned under a JavaScript header
 	if [ ${#refined_array[@]} -eq 0 ]
 	then
-		echo "No JavaScript discovered by Wappalyzer"
+		"No JavaScript discovered by Wappalyzer"
 	else
 		wap_found_js=true
 	fi
@@ -106,32 +98,44 @@ wap_javascript_check(){
 			echo $line | tr -d "[]" | sed 's/versions://g' >> temp
 		fi
 	done < JavaScript_Wappalyzer.txt
+
 	
 	sed -i '/^$/d' temp #removing blank lines
 	
-	touch wap_output_for_security_check
+	awk '!x[$0]++' temp > temp2 #removing duplicates
+	
+	touch wap_output_for_security_check_js
 	
 	while IFS= read -r line; do
 		if [[ $line =~ [0-9] ]]; then
 			next_line=$(IFS= read -r; echo "$REPLY")
 			echo "$next_line $line"
 		fi
-	done < temp > wap_output_for_security_check
-			
+		if [[ "$line" == applications:* ]];then
+			line=${line#applications:}
+		fi
+	done < temp2 > wap_output_for_security_check_js
+
+	#removing the string applications: which sometimes occurs and messes up the API lookup
+	sed -i 's/^applications://' wap_output_for_security_check_js 
+
 	rm temp
+	rm temp2
 }
 
 
 
 wap_programming_language_check(){
+	
 	language_array=()
-	touch pl_wap.txt
-	touch temp.txt
-	touch programming_languages_wap.txt
+	touch Languages_Wappalyzer.txt
+	touch temp
+	touch lan_wap
+	
 	for ((i=0; i<=${#wapparray[@]}; i++));do
 	if [[ ${wapparray[i]} =~ .*Programming.* ]]
 	then
-		echo ${wapparray[i]}
+		#echo ${wapparray[i]}
 		language_array+=(${wapparray[i]})
 		for ((a=1; a<=10; a++))
 		do
@@ -139,7 +143,7 @@ wap_programming_language_check(){
 			then
 				break
 			else	
-				echo ${wapparray[i-a]}
+				#echo ${wapparray[i-a]}
 				language_array+=(${wapparray[i-a]})
 			fi
 		done
@@ -167,24 +171,54 @@ wap_programming_language_check(){
 
 	for elem in "${language_array[@]}"
 	do
-		echo "$elem" | tr -d '"{}' >> pl_wap.txt
+		echo "$elem" | tr -d '"{}' >> lan_wap
 	done
 
-	sed '/^$/d; /\bname\b/{N; s/\n\(.*categories\)/\n\n\1/};' pl_wap.txt > temp.txt
-	sed '/Programming/{N; s/\n/ /};' temp.txt > programming_languages_wap.txt
-	rm pl_wap.txt
-	rm temp.txt
+	sed '/^$/d; /\bname\b/{N; s/\n\(.*categories\)/\n\n\1/};' lan_wap > temp
+	sed '/Programming/{N; s/\n/ /};' temp > Languages_Wappalyzer.txt
+	rm lan_wap
+	rm temp
+	
+	touch temp
+	while read line; do
+		if [[ $line == *"name"* ]]; then
+			echo $line | tr -d "[]" | sed 's/name://g' >> temp
+		fi
+		if [[ $line == *"versions"* ]]; then
+			echo $line | tr -d "[]" | sed 's/versions://g' >> temp
+		fi
+	done < Languages_Wappalyzer.txt
+	
+	sed -i '/^$/d' temp #removing blank lines
+	
+	awk '!x[$0]++' temp > temp2 #removing duplicates
+	
+	touch wap_output_for_security_check_pl
+	
+	while IFS= read -r line; do
+	if [[ $line =~ [0-9] ]]; then
+		next_line=$(IFS= read -r; echo "$REPLY")
+		echo "$next_line $line"
+	fi
+	done < temp2 > wap_output_for_security_check_pl
+	
+	#removing the string applications: which sometimes occurs and messes up the API lookup
+	sed -i 's/^applications://' wap_output_for_security_check_pl
+
+	
+	rm temp
+	rm temp2
 }
 
 wap_webserver_check(){
 	webserver_array=()
-	touch ws_temp.txt
-	touch temp.txt
-	touch webserver_wap.txt
+	touch ws_wap
+	touch temp
+	touch Webserver_Wappalyzer.txt
 	for ((i=0; i<=${#wapparray[@]}; i++));do
 	if [[ ${wapparray[i]} =~ .*servers.* ]]
 	then
-		echo ${wapparray[i]}
+		#echo ${wapparray[i]}
 		webserver_array+=(${wapparray[i]})
 		for ((a=1; a<=10; a++))
 		do
@@ -192,7 +226,7 @@ wap_webserver_check(){
 			then
 				break
 			else	
-				echo ${wapparray[i-a]}
+				#echo ${wapparray[i-a]}
 				webserver_array+=(${wapparray[i-a]})
 			fi
 		done
@@ -201,7 +235,7 @@ wap_webserver_check(){
 	fi
 	done
 
-	#quick check to see if anything's been returned under a Programming Languages header
+	#quick check to see if anything's been returned under Webserver header
 	if [ ${#webserver_array[@]} -eq 0 ]
 	then
 		echo "No web server discovered by Wappalyzer"
@@ -220,9 +254,40 @@ wap_webserver_check(){
 
 	for elem in "${webserver_array[@]}"
 	do
-		echo "$elem" | tr -d '"{}' >> ws_temp.txt
+		echo "$elem" | tr -d '"{}' >> ws_wap
 	done
+	
 
-	#sed '/^$/d; /\bname\b/{N; s/\n\(.*categories\)/\n\n\1/};' pl_wap.txt > temp.txt
-	#sed '/Programming/{N; s/\n/ /};' temp.txt > programming_languages_wap.txt
+	sed '/^$/d; /\bname\b/{N; s/\n\(.*categories\)/\n\n\1/};' ws_wap > temp
+	sed '/Web/{N; s/\n/ /};' temp > Webserver_Wappalyzer.txt
+	
+	rm ws_wap
+	rm temp
+	
+	touch temp
+	while read line; do
+		if [[ $line == *"name"* ]]; then
+			echo $line | tr -d "[]" | sed 's/name://g' >> temp
+		fi
+		if [[ $line == *"versions"* ]]; then
+			echo $line | tr -d "[]" | sed 's/versions://g' >> temp
+		fi
+	done < Webserver_Wappalyzer.txt
+	
+	sed -i '/^$/d' temp #removing blank lines
+	
+	awk '!x[$0]++' temp > temp2 #removing duplicates
+
+	touch wap_output_for_security_check_ws
+	
+	while IFS= read -r line; do #not doing vulnerability lookup so no need for the if statement
+		next_line=$(IFS= read -r; echo "$REPLY")
+		echo "$next_line $line"
+	done < temp2 > wap_output_for_security_check_ws
+	
+	#removing the string applications: which sometimes occurs and messes up the API lookup
+	sed -i 's/^applications://' wap_output_for_security_check_ws
+	
+	rm temp
+	rm temp2
 }

@@ -42,7 +42,7 @@ mention_JavaScript(){
 	#Removing newline chars with sed and putting into an array
 	js_filtered=$(echo $js_filtered | sed 's/[[:space:]]*$//')
 	IFS=' ' read -a js_array <<< $js_filtered
-	echo "Every mention of a JS file found in the host's source code:"
+	echo -e "\nEvery mention of a JS file found in the host's source code:"
 
 	for element in ${js_array[@]}
 	do
@@ -81,7 +81,7 @@ mention_php(){
 	php_filtered=$(echo $php_filtered | sed 's/[[:space:]]*$//')
 	IFS=' ' read -ra php_array <<< $php_filtered
 
-	echo "Every trace of PHP found in the host's source code:"
+	echo -e "\nEvery trace of PHP found in the host's source code:"
 	for element in ${php_array[@]}
 	do
 		echo $element
@@ -112,7 +112,7 @@ mention_asp(){
 
 	mention_asp_filtered=$(echo $mention_asp | sed 's/[[:space:]]*$//')
 	IFS=' ' read -ra asp_array <<< $mention_asp_filtered
-	echo "Every trace of ASP found in the host's source code:"
+	echo -e "\nEvery mention of ASP found in the host's source code:"
 	for element in ${asp_array[@]}
 	do
 		echo $element

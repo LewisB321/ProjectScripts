@@ -105,8 +105,8 @@ apache_ver_check() {
 		webservlatest=true
 	else
 		echo "Latest Apache version:" $latest_version_apache
-		echo -e "\nNew Apache version available for download. Please visit httpd.apache.org/download.cgi for more information"
-		echo "Running an old web server version may leave the instance succeptible to disclosed vulnerabilities but it is not always the best option either. Please think carefully before (not) upgrading your instance"
+		echo -e "\nNew Apache version available for download"
+
 	fi
 }
 
@@ -117,8 +117,8 @@ nginx_ver_check() {
 		webservlatest=true
 	else
 		echo "Latest nginx version:" $latest_version_nginx
-		echo -e "\nNew nginx version available for download. Please visit www.nginx.org/en/download.html for more information"
-		echo "Running an old web server version may leave the instance succeptible to disclosed vulnerabilities but it is not always the best option either. Please think carefully before (not) upgrading your instance"
+		echo -e "\nNew nginx version available for download"
+
 	fi
 }
 
@@ -129,8 +129,8 @@ gunicorn_ver_check() {
 		webservlatest=true
 	else
 		echo "Latest gunicorn version:" $latest_version_gunicorn
-		echo -e "\nNew gunicorn version available for download. Please visit www.pypi.org/projects/gunicorn for more information"
-		echo "Running an old web server version may leave the instance succeptible to disclosed vulnerabilities but it is not always the best option either. Please think carefully before (not) upgrading your instance"
+		echo -e "\nNew gunicorn version available for download"
+
 	fi
 }
 
@@ -141,7 +141,7 @@ iis_ver_check() {
 		webservlatest=true
 	else
 		echo "Latest IIS version:" $latest_version_iis
-		echo -e "\nNew IIS version available for download. Please visit iis.net/downloads for more information"
-		echo "Running an old web server version may leave the instance succeptible to disclosed vulnerabilities but it is not always the best option either. Please think carefully before (not) upgrading your instance"
+		echo -e "\nNew IIS version available for download"
+
 	fi
 }

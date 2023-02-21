@@ -15,20 +15,16 @@ source output.sh
 source securitylookup.sh
 
 #flags to alter script behaviour
-while getopts h:p:f:r:w: flag
+while getopts h:p:r:w: flag
 do
 	case "${flag}" in
 		h) host=${OPTARG};;
 		p) publicsite=${OPTARG};;
-		f) force=${OPTARG};;
 		r) resourceskip=${OPTARG};;
 		w) wapp=${OPTARG};;
-
 	esac
 done
-wappalyzer
-output
-exit
+
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 echo "Thank you for using this script. Please contact" 
 echo "lewisblythe0121@gmail.com if something doesn't work"
@@ -42,33 +38,22 @@ if [[ $publicsite == 'y' ]];then
 		echo "Host is refusing certain curl connections, so this script will not behave properly. Stopping script execution"
 		exit
 	fi
-fi
-
-#pingtest for host's availability. Will exit if host is unreachable
-#There are easier ways to check host availability than with ping but I don't have time to change it
-ping $host -q -c 4 2>&1 >/dev/null
-
-#return code from ping is always 0 if host can be reached
-if [[ $? == 0 ]];then
-	false
-else
-	echo "The host appears to be offline or not responding to a pingtest. "
-	if echo $* | grep -e "-f" -q;then
-		if [[ $force != "y" ]];then
-			echo -e "\nStopping script execution"
-			exit 1
-		else
-			echo -e "\nForce flag detected. Moving on"
-		fi
+	if [[ $exit_code == 6 ]];then
+		echo "Host is unreachable. Stopping script execution"
+		exit
+	fi
+	if [[ $exit_code == 60 ]];then
+		echo "Host's SSL certificate cannot be trusted. Stopping script execution"
+		echo "You may want to try -p n to try HTTP rather than HTTPS but the script"
+		echo "may misbehave and show innacurate results if port80 is closed/filtered"
+		exit
 	fi
 fi
 
 #The beginning of the tests
-echo -e "\nBeginning test for web server\n"
+
 webservercheck
-
-echo -e "\nBeginning test for supported http methods\n"
-
+echo -e "\n"
 httpmethods
 
 ######MULTIPLE TECHNOLOGIES######
