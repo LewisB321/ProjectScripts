@@ -10,11 +10,12 @@ xpoweredby(){
 		Header_Data=$(curl -sI -L http://"$host" | grep -i "x-powered-by" | awk '{$1=""}1')
 		asp_extra_check=$(curl -sI -L http://"$host" | grep -i "x-aspnet" | awk '{$1=""}1')
 	fi
-	#wordcount store
-	test_xpb=$(echo $Header_Data | wc -w)
-	#echo $Header_Data
 
-	#variable empty if header not there
+	test_xpb=$(echo $Header_Data | wc -w)
+	#Had to trim beginning whitespace in a very awkward way, just wouldn't work with sed, xargs or parameter expansion
+	Header_Data=$(echo $Header_Data | tr -s ' ' | cut -d ' ' -f 2-)
+
+	#Variable empty if header not there
 	if [[ $test_xpb == 0 ]];then
 		echo -e "\nX-Powered-By header not present"
 	else
@@ -30,7 +31,7 @@ xpoweredby(){
 
 	#Sometimes there may be a x-ASPNET(MSV)-version header that we can also look for
 aspcheck(){
-	#function for grepping header return for string "ASP.NET"
+	#Function for grepping header return for string "ASP.NET"
 	asp_check=$(echo $Header_Data | grep -i "ASP.NET")
 	asp_check_wc=$(echo $asp_check | wc -w)
 	asp_extra_check_wc=$(echo $asp_extra_check | wc -w)
@@ -49,10 +50,12 @@ aspcheck(){
 }
 
 phpcheck(){
-	#function for grepping header return for string "PHP"
-	#had to add regex check for the hashtopolis example. Does not affect others
+	#Function for grepping header return for string "PHP"
+	#Had to add regex check for the hashtopolis example to remove the substring about the operating system. Does not affect others
 	php_check=$(echo $Header_Data | grep -i "PHP")
+	echo $php_check
 	php_check=$(echo $php_check | grep -o "^[^-]*")
+	echo $php_check
 	php_check_wc=$(echo $php_check | wc -w)
 	if [[ $php_check_wc == 0 ]];then
 		echo "PHP undiscovered by header data"
@@ -63,7 +66,7 @@ phpcheck(){
 }
 
 jscheck(){
-	#function for grepping header return for string for several indications of JS. Could be extended but for proof of concept this is fine
+	#Function for grepping header return for string for several indications of JS. Could be extended but for proof of concept this is fine
 	echo "express" > jschecklist
 	echo "node" >> jschecklist
 	echo "backbone" >> jschecklist
@@ -90,7 +93,7 @@ jscheck(){
 }
 
 frameworkcheck(){
-	#function for grepping header return for framework indication. Big longshot
+	#Function for grepping header return for framework indication. Big longshot
 	echo "wordpress" > frameworkchecklist
 	echo "laravel" >> frameworkchecklist
 	echo "ruby" >> frameworkchecklist #ruby on rails

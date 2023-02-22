@@ -2,8 +2,8 @@
 
 nmapscript_referer(){
 
-	#uses nmap http-referer-checker script to determine the use of third party scripts
-	#use grep & sed to remove any instances of port number from the host temporarily (incase of a container)
+	#Uses nmap http-referer-checker script to determine the use of third party scripts
+	#Use grep & sed to remove any instances of port number from the host temporarily (incase of a container)
 	if echo $host | grep -q ':';then
 		temp_host=$(echo $host | grep -oP '(.*?)\:' | sed 's/://')
 		nmap -o nmap_script_output.txt -p80,443 --script http-referer-checker.nse $temp_host >/dev/null
@@ -11,7 +11,7 @@ nmapscript_referer(){
 		nmap -o nmap_script_output.txt -p80,443 --script http-referer-checker.nse $host >/dev/null
 	fi
 
-	#used to store wordcount
+	#Used to store wordcount
 	test_nmap=$(cat nmap_script_output.txt | grep "Couldn't find any cross-domain scripts" | wc -w)
 	if [[ $test_nmap == 0 ]];then
 		test_nmap=$(cat nmap_script_output.txt | grep -i "Closed" | wc -w)
@@ -20,7 +20,7 @@ nmapscript_referer(){
 	fi
 
 
-	#variable will be empty if something has been returned
+	#Variable will be empty if something has been returned
 	if [[ $test_nmap != 0 ]];then
 		echo "Host is not using any Cross-Domain JS scripts"
 	else
@@ -56,7 +56,7 @@ jsfolderaccess() {
 		jsfolder=$(curl -sI -L http://$host/js/ | wc -c)
 	fi
 
-	#silent redirect checker. DOES NOT WORK WITH TWITTER >:(
+	#Silent redirect checker. NOT ALWAYS RELIABLE but the best idea I have
 	if [ $indexpage -eq $jsfolder ];then
 		echo "Silent redirected detected when attempting to access /js"
 	else	
@@ -67,7 +67,7 @@ jsfolderaccess() {
 				echo -e "\nJS folder not present"
 			fi
 		else
-			#grep mention of javascript then get the wordcount of that. 0 if nothing is found
+			#Grep mention of javascript then get the wordcount of that. 0 if nothing is found
 			js_folder_accessed=true
 			curl -sL -o JSfolder.txt $host/js/ 
 			jsfolderfiles=$(grep -o -P 'href=.*\.js(?=">)' JSfolder.txt | sed 's/href="//')
@@ -82,7 +82,7 @@ jsfolderaccess() {
 				echo -e "\nJS identified in the JS folder"
 				echo "Below are all the discovered files in /js that contain the .js extension:"
 
-				#using sed to remove instances of space that mess with how the string is read into the array
+				#Using sed to remove instances of space that mess with how the string is read into the array
 				jsfolderfiles=$(echo $jsfolderfiles | sed 's/[[:space:]]*$//')
 				IFS=' ' read -ra allfiles <<< $jsfolderfiles
 				for element in ${allfiles[@]}

@@ -1,5 +1,9 @@
 #! /bin/bash
 
+
+#This function uses the API of https://nvd.nist.gov with keyword parameters to query the database using the software & version number as a base. Will then return
+#and output the instances to the main outputted text file
+
 securitylookup(){
 	
 	technology=$1

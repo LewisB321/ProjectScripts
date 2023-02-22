@@ -1,7 +1,7 @@
 #! /bin/bash
 
 webservercheck(){
-#hardcoded latest versions. Can't really find an accurate way of scraping this so it'll have to do
+#Hardcoded latest versions. Can't really find an accurate way of web scraping the versions so it'll have to do
 latest_version_apache="Apache/2.4.55"
 latest_version_nginx="nginx/1.23.3"
 latest_version_gunicorn="gunicorn/20.1.0"
@@ -13,13 +13,11 @@ else
 	version=$(curl -sI -L http://"$host" | grep -m 1 -iw "Server:" | awk '{print $2}')
 fi
 
-#wordcount for later use
-version_wc=$(echo $version | wc -w)
 
-#check whether anything in variable i.e. whether anything at all has been grepped
+version_wc=$(echo $version | wc -w)
 identified=$(echo $version | wc -w)
 
-#will output web server version if it's been found
+#Check if anything's been found
 if [[ $identified == 0 ]];then
 	echo "Web server could not be identified"
 else
@@ -28,7 +26,7 @@ else
 	
 fi
 
-#to discover whether the software is supported in this script and pass if it's not
+#To discover whether the software is supported in this script and pass if it's not
 touch supportedchecklist
 echo "Apache" >> supportedchecklist
 echo "nginx" >> supportedchecklist
@@ -42,11 +40,11 @@ if [[ $type == 0 ]];then
 fi
 rm supportedchecklist
 
-#check to see whether numbers are present i.e. a version number 
+#Check to see whether there's a version number 
 if [[ $version =~ [0-9] ]];then
 	has_version=true
 else
-	#quick check uisng the wordcount to end the function if nothing is returned from the version. If not, the else clause always runs
+	#Quick check uisng the wordcount to end the function if nothing is returned from the version. If not, the else clause always runs
 	if [[ $version_wc == 0 ]];then
 		return 0
 	else
@@ -54,7 +52,7 @@ else
 	fi
 fi
 
-#tests to determine different webserver software
+#Small tests to determine different webserver software
 test_for_apache=$(echo $version | grep -o "Apache" | wc -w)
 if [[ $test_for_apache == 1 ]];then
 	is_apache=true
@@ -83,8 +81,8 @@ else
 	false
 fi
 
-#final comparison if version number has been identified. A check is ran based on earlier flags and a comparison is made 
-#based on the correct software
+#Final comparison if version number has been identified. A check is ran based on earlier flags and a comparison is made 
+#Based on the correct software
 if [[ $has_version == true ]];then
 
 	if [[ $is_apache == true ]];then
@@ -112,7 +110,7 @@ else
 fi
 }
 
-#placed the check code inside of their own functions to help with scalability if necessary
+#Placed the check code inside of their own functions to help with scalability if necessary
 apache_ver_check() {
 	apache=$(echo -n $version | tr -d '[:space:]')
 	if [[ $latest_version_apache == $apache ]];then

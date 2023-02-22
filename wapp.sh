@@ -3,22 +3,21 @@
 wappalyzer(){
 
 	#Uses the wappalyzer api 
-	#the custom API key is free but limited use
-
-	#comment the below when not using
+	#The API is limited use and uses a key I bought
+	#Returns a messy JSON output so lots of cleaning necessary - often has some repeating values
 	wappresults=$(curl -sH "x-api-key: YHyeImfviK4i1cjlQcSVeQFPjRp6U447lccmIoz8" "https://api.wappalyzer.com/lookup/v1/?url=https://$host")
 
 
-	#the api call will return invalid if the remote host can't be found. This if statement is to determine this
-	#and only print the output if the test was successful
+	#The api call will return invalid if the remote host can't be found. This if statement is to determine this
+	#And only print the output if the test was successful
 	if echo $wappresults | grep -qE "Invalid|could not be resolved";then
 		echo -e "\nWappalyzer test unsuccessful. It's very likely that the host could not be queried or the API key has ran out"
 		return 0
 	else
-		#read the raw output from the API into an array seperated by commas
+		#Read the raw output from the API into an array seperated by commas
 		wap=true
 		IFS=',' read -r -a wapparray <<< $wappresults
-		#prints the array. Must find a way to clean this up
+		#Prints the array. Must find a way to clean this up
 		echo -e "\nWappalyzer test successful. Output is too large for the command line. Please refer to the text files"
 		#echo "Raw Wappalyzer output: " ${wapparray[@]}
 	fi
@@ -32,6 +31,15 @@ wappalyzer(){
 
 
 }
+
+#These following tests all follow the same format:
+# 1: Grab every instance of a string like JavaScript and place it into it's own array along with the accompanying data alongside it
+# 2: Check if anything's been returned
+# 3: Unset every instance of the string 'hits' because it's useless and I needed the blankspace line
+# 4: Remove uneccessary characters and get it to an easily-readable format
+# 5: Make another temporary text file with values that are instead appropriate for the vulnerability lookup. Will be deleted in the output function
+# 6: Perform some minor alterations based on each use case i.e. some include the string 'applications:' for seemingly no reason
+
 
 wap_javascript_check(){
 
@@ -60,7 +68,6 @@ wap_javascript_check(){
 		fi
 	done
 
-	#quick check to see if anything's been returned under a JavaScript header
 	if [ ${#refined_array[@]} -eq 0 ]
 	then
 		echo "No JavaScript discovered by Wappalyzer"

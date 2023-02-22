@@ -1,11 +1,15 @@
 #! /bin/bash
 
 output() {
-	#making the timestamped file
+	#Making the timestamped file
 	timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
 	file_name=$host"_"$timestamp".txt"
 	touch $file_name
 	
+	#The following is the procedure of getting the results of each test into a text file
+	#I'm using the flags set up in each individual test to determine what's been found
+	#and what hasn't been found
+
 
 	###########################WEBSERVER OUTPUT###############################
 	if [ $found_webserver ];then

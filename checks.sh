@@ -18,11 +18,11 @@ source securitylookup.sh
 while getopts h:s:r:w:p: flag
 do
 	case "${flag}" in
-		h) host=${OPTARG};;
-		s) publicsite=${OPTARG};;
-		r) resourceskip=${OPTARG};;
-		w) wapp=${OPTARG};;
-		p) phpskip=${OPTARG};;
+		h) host=${OPTARG};; #Specify the host
+		s) publicsite=${OPTARG};; #Specify whether to use http or https for most test cases
+		r) resourceskip=${OPTARG};; #Specify whether to skip the functions to access /resources and /js
+		w) wapp=${OPTARG};; #Specify whether to use the Wappalyzer API to try and discover technologies
+		p) phpskip=${OPTARG};; #Specify whether to skip the function to try phpinfo.php and /phpmyadmin
 	esac
 done
 
@@ -33,7 +33,7 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 
 if [[ $publicsite == 'y' ]];then
-	response=$(curl -s --fail --max-time 15 https://$host 2>/dev/null)
+	response=$(curl -s --fail --max-time 15 https://$host 2>/dev/null) #Initial curl request to try and catch bad hosts. Upgraded from pingtest
 	exit_code=$?
 	if [[ $exit_code == 35 ]];then
 		echo "Host is refusing certain curl connections, so this script will not behave properly. Stopping script execution"
@@ -57,54 +57,51 @@ fi
 
 #The beginning of the tests
 
-webservercheck
-echo -e "\n"
-httpmethods
+webservercheck #Will attempt to identify the host's webserver software based upon returned headers
 
-######MULTIPLE TECHNOLOGIES######
-echo -e "\nNow running tests to determine 1) Use of ASP.NET 2) PHP version(s) or 3) JS version(s) or libraries"
-xpoweredby
-if [[ $resourceskip == "y" ]];then #skips resource check if flag is given
+echo -e "\n"
+
+httpmethods #Will attempt to identify the supported http methods on the host
+
+echo -e "\n"
+
+xpoweredby #Will attempt to read the x-powered-by header which sometimes discloses used technologies
+
+
+if [[ $resourceskip == "y" ]];then
 	false
 else
-	resourceaccess
+	resourceaccess #Will attempt to read /resources and return anything with the .php or .js extension
 fi
-mention 
 
-#optional test which depends on whether the site is publicly available or not
-#uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
+mention #Will attempt to read the host's index source code and return any mention of JavaScript scripts (not simply the string)
+
 if echo $* | grep -e "-w" -q;then
 	if [[ $wapp == "y" ]];then
-		wappalyzer
+		wappalyzer #Uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
 	else
 		false
 	fi
 else
 	false
 fi
-#################################
 
-##############PHP################
 if [[ $phpskip == 'y' ]];then
 	false
 else
-	phpinfo
-	phpmyadmin
+	phpinfo #Will make a curl request to /phpinfo.php to discover whether it exists
+	phpmyadmin #Will make a curl request to /phpmyadmin to discover whether it exists
 fi
-################################
 
-##############JS################
-nmapscript_referer
-if [[ $resourceskip == "y" ]];then #skips resource check if flag is given
+nmapscript_referer #Uses an nmap script to find any third-party script usage
+
+if [[ $resourceskip == "y" ]];then
 	false
 else
-	jsfolderaccess
+	jsfolderaccess #Will attempt to read /js and return anything with the .js extension
 fi
 
-##############################
-
-###########OTHERS#############
-etag_check
+etag_check #Simply checks for the eTag header which may cause a small security risk
 
 echo -e "\nNow probing target to determine TLS ciphersuite"
 
@@ -121,10 +118,8 @@ else
 	echo "Host is suitable for ciphersuite analysis"
 	enum_ciphers
 fi
-#############################
 
-
-
+#Calls the output script if user selects yes
 read -p "Would you like to output this summary to a text file? (Y/N)" output
 
 if [[ $output == 'y' ]];then

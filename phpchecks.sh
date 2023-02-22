@@ -1,9 +1,9 @@
 #! /bin/bash
 
 phpinfo(){
-	 #this test will use curl to check the response to access attempts for phpinfo in its default location
-	 #return code not good indicator for silent redirects. Used the source code size instead
-	 #again, not perfect because the size could be dynamic but I see this as the most likely method
+	 #This test will use curl to check the response to access attempts for phpinfo in its default location
+	 #Return code not good indicator for silent redirects. Used the source code size instead
+	 #Again, not perfect because the size could be dynamic but I see this as the most likely method
 
 	 if [[ $publicsite == "y" ]];then
 		php_returncode=$(curl -sI https://$host/phpinfo.php | grep "HTTP" | awk '{print $2}')
@@ -37,7 +37,7 @@ phpinfo(){
 
 phpmyadmin(){
 
-	 #this test will use curl to check the response to access attempts for phpmyadmin in its default location
+	 #This test will use curl to check the response to access attempts for phpmyadmin in its default location
 	 if [[ $publicsite == "y" ]];then
 	 	myadmin_returncode=$(curl -sI https://$host/phpmyadmin/ | grep "HTTP" | awk '{print $2}')
 	 	indexpage=$(curl -sI -L https://$host | wc -c)	

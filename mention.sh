@@ -25,7 +25,7 @@ mention(){
 
 mention_JavaScript(){
 
-	mention_js=$(echo $webpage | grep -i 'script type="text/javascript"')
+	mention_js=$(echo $webpage | grep -oi 'script type="text/javascript"') #Grabs every line that includes this
 	mention_js_wc=$(echo $mention_js | wc -w)
 	
 	if [[ $mention_js_wc == 0 ]];then
@@ -47,7 +47,7 @@ mention_JavaScript(){
 	for element in ${js_array[@]}
 	do
 		if echo $element | grep -q ".js";then #if element contains the substring .js
-			#get the output but remove unecessary characters (1: The source 2: the start of script 3: the end of script)
+			#Get the output but remove unecessary characters (1: The source tag 2: the start of script 3: the end of script) to leave just the name
 			add_to_array=$(echo $element | sed 's/^src="//' | sed 's#"></script><script$##' | sed 's#"></script>#\n#')
 			echo $add_to_array
 			js_array_refined+=($add_to_array)
@@ -64,7 +64,7 @@ mention_JavaScript(){
 
 mention_php(){
 
-	mention_php=$(echo $webpage | grep -o "\.php") #\ is because . is a special character and won't be used literally
+	mention_php=$(echo $webpage | grep -o "\.php")
 	mention_php_wc=$(echo $mention_php | wc -w)
 
 	if [[ $mention_php_wc == 0 ]];then
@@ -94,7 +94,7 @@ mention_php(){
 
 mention_asp(){
 
-	#these 2 strings are often hidden and used by asp. Presence of these indicates ASP is being used
+	#First 2 strings are often hidden and used by asp. Presence of these indicates ASP is being used
 	echo "__VIEWSTATE" > mention_asp.txt
 	echo "__EVENTVALIDATION" >> mention_asp.txt
 	echo "ASP.NET" >> mention_asp.txt
@@ -110,7 +110,7 @@ mention_asp(){
 	fi
 
 
-	mention_asp_filtered=$(echo $mention_asp | sed 's/[[:space:]]*$//')
+	mention_asp_filtered=$(echo $mention_asp | sed 's/[[:space:]]*$//') #Similar cleaning procedure as the above 2 functions
 	IFS=' ' read -ra asp_array <<< $mention_asp_filtered
 	echo -e "\nEvery mention of ASP found in the host's source code:"
 	for element in ${asp_array[@]}
