@@ -19,13 +19,17 @@ phpinfo(){
 	 	echo "Silent redirect detected. phpinfo.php most likely not present"
 	 else
 	 	if [[ $php_returncode == 200 ]];then
-	 		echo -e "\nphpinfo.php webpage found. Visit {host}/phpinfo.php to confirm"
+	 		echo -e "\nphpinfo.php found. Visit {host}/phpinfo.php to confirm"
 	 		found_phpinfo=true
 	 	else
 	 		if [[ $php_returncode == 403 ]];then
 	 			echo "Permission to access phpinfo.php blocked"
 	 		else
-	 			echo -e "\nphpinfo.php not detected"
+	 			if [[ $php_returncode == 301 ]];then
+	 				echo "Redirect detected when trying to access /phpinfo.php"
+	 			else
+	 				echo -e "\nphpinfo.php not detected"
+	 			fi
 	 		fi
 	 	fi
 	 fi

@@ -25,9 +25,24 @@ if [[ $identified == 0 ]];then
 else
 	echo "The web server detected on the host is: "$version
 	found_webserver=true
+	
 fi
-#check to see whether numbers are present i.e. a version number 
 
+#to discover whether the software is supported in this script and pass if it's not
+touch supportedchecklist
+echo "Apache" >> supportedchecklist
+echo "nginx" >> supportedchecklist
+echo "gunicorn" >> supportedchecklist
+echo "IIS" >> supportedchecklist
+type=$(echo $version | grep -iof supportedchecklist | wc -w)
+if [[ $type == 0 ]];then
+	echo "This script does not yet support this web server software"
+	not_supported_ws=true
+	return 0
+fi
+rm supportedchecklist
+
+#check to see whether numbers are present i.e. a version number 
 if [[ $version =~ [0-9] ]];then
 	has_version=true
 else

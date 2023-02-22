@@ -63,7 +63,7 @@ wap_javascript_check(){
 	#quick check to see if anything's been returned under a JavaScript header
 	if [ ${#refined_array[@]} -eq 0 ]
 	then
-		"No JavaScript discovered by Wappalyzer"
+		echo "No JavaScript discovered by Wappalyzer"
 	else
 		wap_found_js=true
 	fi

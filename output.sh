@@ -41,10 +41,14 @@ output() {
 			securitylookup $software $version_num $file_name
 			fi
 		else
-			echo "Version could not be identified" >> $file_name
+			if [ $not_supported_ws ];then
+				echo "Webserver is not currently supported by script, therefore no checks can be made" >> $file_name
+			else
+				echo "Version could not be identified" >> $file_name
+			fi
 		fi
 	else
-		echo "Webserver could not be identified" >> $file_name
+		echo "Webserver could not be identified or is not supported by this script" >> $file_name
 	fi
 	########################################################################
 
@@ -107,44 +111,55 @@ output() {
 	echo " " >> $file_name
 
 	##############################RESOURCE ACCESS###############################
-	if [ $resource_folder_accessed ];then
-		echo "Resource folder discovered" >> $file_name
-		if [ $found_js_resource_access ];then
-			echo "Javascript files found inside the resource folder: " >> $file_name
-			for element in ${jsfiles_array[@]};do
-				echo $element >> $file_name
-			done
-		else
-			echo "No trace of JavaScript in the resource folder" >> $file_name
-		fi
-		if [ $found_php_resource_access ];then
-			echo "PHP files found inside the resource folder: " >> $file_name
-			for element in ${phpfiles_array[@]};do
-				echo $element >> $file_name
-			done
-		else
-			echo "No trace of PHP in the resource folder" >> $file_name
-		fi
+	if [[ $resourceskip == 'y' ]];then
+		echo "Resource/JavaScript folder access skip flag detected" >> $file_name
 	else
-		echo "Resource folder has not been discovered or is inaccessible by this script" >> $file_name
+		if [ $resource_folder_accessed ];then
+			echo "Resource folder discovered" >> $file_name
+			if [ $found_js_resource_access ];then
+				echo "Javascript files found inside the resource folder: " >> $file_name
+				for element in ${jsfiles_array[@]};do
+					echo $element >> $file_name
+				done
+			else
+				echo "No trace of JavaScript in the resource folder" >> $file_name
+			fi
+			if [ $found_php_resource_access ];then
+				echo "PHP files found inside the resource folder: " >> $file_name
+				for element in ${phpfiles_array[@]};do
+					echo $element >> $file_name
+				done
+			else
+				echo "No trace of PHP in the resource folder" >> $file_name
+			fi
+		else
+			echo "Resource folder has not been discovered or is inaccessible by this script" >> $file_name
+		fi
 	fi
+	
+	
 	############################################################################
 
 	echo " " >> $file_name
 
 	#############################JS ACCESSED####################################
-	if [ $js_folder_accessed ];then
-		if [ $js_in_js_folder ];then
-			echo "JavaScript files found inside the JavaScript folder: " >> $file_name
-			for element in ${allfiles[@]};do
-				echo $element >> $file_name
-			done
-		else
-			echo "JavaScript folder discovered but no traces of JavaScript" >> $file_name
-		fi
+	if [[ $resourceskip == 'y' ]];then
+		echo "Resource/JavaScript folder access skip flag detected" >> $file_name
 	else
-		echo "JavaScript folder has not been discovered or is inaccessible by this script" >> $file_name
+		if [ $js_folder_accessed ];then
+			if [ $js_in_js_folder ];then
+				echo "JavaScript files found inside the JavaScript folder: " >> $file_name
+				for element in ${allfiles[@]};do
+					echo $element >> $file_name
+				done
+			else
+				echo "JavaScript folder discovered but no traces of JavaScript" >> $file_name
+			fi
+		else
+			echo "JavaScript folder has not been discovered or is inaccessible by this script" >> $file_name
+		fi
 	fi
+	
 	############################################################################
 
 	echo " " >> $file_name
@@ -183,15 +198,19 @@ output() {
 	echo " " >> $file_name
 
 	#################################PHP######################################
-	if [ $found_phpinfo ];then
-		echo "phpinfo.php discovered at {host}/phpinfo.php" >> $file_name
+	if [[ $phpskip == 'y' ]];then
+		echo "PHP test skip flag detected" >> $file_name
 	else
-		echo "phpinfo.php undetected/inaccessible" >> $file_name
-	fi
-	if [ $found_phpmyadmin ];then
-		echo "phpmyadmin discovered at {host}/phpmyadmin" >> $file_name
-	else
-		echo "phpmyadmin undetected/inaccessible" >> $file_name
+		if [ $found_phpinfo ];then
+			echo "phpinfo.php discovered at {host}/phpinfo.php" >> $file_name
+		else
+			echo "phpinfo.php undetected/inaccessible" >> $file_name
+		fi
+		if [ $found_phpmyadmin ];then
+			echo "phpmyadmin discovered at {host}/phpmyadmin" >> $file_name
+		else
+			echo "phpmyadmin undetected/inaccessible" >> $file_name
+		fi
 	fi
 	###########################################################################
 
@@ -239,7 +258,6 @@ output() {
 				securitylookup $software $version_num $file_name
 			done < wap_output_for_security_check_js
 			echo -e "For the full results of JavaScript technologies, please refer to JavaScript_Wappalyzer.txt\n" >> $file_name
-			rm wap_output_for_security_check_js
 		else
 			echo -e "JavaScript discovered but no version could be identified. Please refer to JavaScript_Wappalyzer.txt\n" >> $file_name
 		fi
@@ -250,6 +268,9 @@ output() {
 			echo -e "Wappalyzer test could not run or bypass flag was given\n" >> $file_name
 		fi
 	fi
+	rm wap_output_for_security_check_js 2>/dev/null
+	
+	
 	
 	if [ $wap_found_prog_language ];then
 		if grep -q '[0-9]' wap_output_for_security_check_pl;then
@@ -262,7 +283,7 @@ output() {
 				securitylookup $software $version_num $file_name
 			done < wap_output_for_security_check_pl
 			echo -e "For the full results of Programming Languages, please refer to Languages_Wappalyzer.txt\n" >> $file_name
-			rm wap_output_for_security_check_pl
+			
 		else
 			echo -e "Programming Languages discovered but contain no version number. Please refer to Languages_Wappalyzer.txt\n" >> $file_name
 		fi
@@ -272,6 +293,9 @@ output() {
 			echo -e "No Programming Languages discovered by Wappalyzer\n" >> $file_name
 		fi
 	fi
+	rm wap_output_for_security_check_pl 2>/dev/null
+	
+	
 	
 	if [ $wap_found_webserver ];then
 		if grep -q '[0-9]' wap_output_for_security_check_ws;then
@@ -283,12 +307,11 @@ output() {
 				version_num="${version_num}x"
 				securitylookup $software $version_num $file_name
 			done < wap_output_for_security_check_ws
-			echo "If this information conflicts with the first test it's likely that this is more reliable" >> $file_name
-			rm wap_output_for_security_check_ws #no security test conducted on this for data cleaning reasons		
+			echo "If this information conflicts with the first test it's likely that this is more reliable" >> $file_name		
 		else
 			ws_wc=$(cat wap_output_for_security_check_ws | wc -w)
 			if [[ $ws_wc != 0 ]];then
-				echo "Webserver Software discovered by Wappalyzer but no version given. Please refer to Webserver_Wappalyzer.txt"
+				echo "Webserver Software discovered by Wappalyzer but no version given. Please refer to Webserver_Wappalyzer.txt" >> $file_name
 			else
 				if [ $wap ];then
 				echo "No Webserver Software discovered by Wappalyzer" >> $file_name
@@ -296,6 +319,9 @@ output() {
 			fi
 		fi
 	fi
+	rm wap_output_for_security_check_ws 2>/dev/null
+	
+	
 	
 	#############################################################################
 

@@ -15,13 +15,14 @@ source output.sh
 source securitylookup.sh
 
 #flags to alter script behaviour
-while getopts h:p:r:w: flag
+while getopts h:s:r:w:p: flag
 do
 	case "${flag}" in
 		h) host=${OPTARG};;
-		p) publicsite=${OPTARG};;
+		s) publicsite=${OPTARG};;
 		r) resourceskip=${OPTARG};;
 		w) wapp=${OPTARG};;
+		p) phpskip=${OPTARG};;
 	esac
 done
 
@@ -32,7 +33,7 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 
 if [[ $publicsite == 'y' ]];then
-	response=$(curl -s --fail https://$host 2>/dev/null)
+	response=$(curl -s --fail --max-time 15 https://$host 2>/dev/null)
 	exit_code=$?
 	if [[ $exit_code == 35 ]];then
 		echo "Host is refusing certain curl connections, so this script will not behave properly. Stopping script execution"
@@ -46,6 +47,10 @@ if [[ $publicsite == 'y' ]];then
 		echo "Host's SSL certificate cannot be trusted. Stopping script execution"
 		echo "You may want to try -p n to try HTTP rather than HTTPS but the script"
 		echo "may misbehave and show innacurate results if port80 is closed/filtered"
+		exit
+	fi
+	if [[ $exit_code == 28 ]];then
+		echo "Host is taking too long to respond. Stopping script execution"
 		exit
 	fi
 fi
@@ -80,8 +85,12 @@ fi
 #################################
 
 ##############PHP################
-phpinfo
-phpmyadmin
+if [[ $phpskip == 'y' ]];then
+	false
+else
+	phpinfo
+	phpmyadmin
+fi
 ################################
 
 ##############JS################

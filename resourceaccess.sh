@@ -14,7 +14,6 @@ resourceaccess() {
 		resourcefolder=$(curl -sI -L http://$host/resources | wc -c)
 	fi
 
-
 	#silent direct checker
 	if [ $indexpage -eq $resourcefolder ];then
 		echo "Silent redirect detected when attempting to access /resources"

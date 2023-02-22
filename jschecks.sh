@@ -49,11 +49,11 @@ jsfolderaccess() {
 	if [[ $publicsite == "y" ]];then
 		returncode=$(curl -sI -L https://$host/js/ | grep "HTTP" | awk '{print $2}')
 		indexpage=$(curl -sI -L https://$host | wc -c)	
-		jsfolder=$(curl -sI -L https://$host/js | wc -c)
+		jsfolder=$(curl -sI -L https://$host/js/ | wc -c)
 	else
 		returncode=$(curl -sI -L http://$host/js/ | grep "HTTP" | awk '{print $2}')
 		indexpage=$(curl -sI -L http://$host | wc -c)	
-		jsfolder=$(curl -sI -L http://$host/js | wc -c)
+		jsfolder=$(curl -sI -L http://$host/js/ | wc -c)
 	fi
 
 	#silent redirect checker. DOES NOT WORK WITH TWITTER >:(
@@ -69,7 +69,7 @@ jsfolderaccess() {
 		else
 			#grep mention of javascript then get the wordcount of that. 0 if nothing is found
 			js_folder_accessed=true
-			curl -s -o JSfolder.txt $host/js/ 
+			curl -sL -o JSfolder.txt $host/js/ 
 			jsfolderfiles=$(grep -o -P 'href=.*\.js(?=">)' JSfolder.txt | sed 's/href="//')
 			jsfolderfiles_wc=$(echo $jsfolderfiles | wc -w)
 			rm JSfolder.txt
