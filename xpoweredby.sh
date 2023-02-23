@@ -53,9 +53,7 @@ phpcheck(){
 	#Function for grepping header return for string "PHP"
 	#Had to add regex check for the hashtopolis example to remove the substring about the operating system. Does not affect others
 	php_check=$(echo $Header_Data | grep -i "PHP")
-	echo $php_check
 	php_check=$(echo $php_check | grep -o "^[^-]*")
-	echo $php_check
 	php_check_wc=$(echo $php_check | wc -w)
 	if [[ $php_check_wc == 0 ]];then
 		echo "PHP undiscovered by header data"

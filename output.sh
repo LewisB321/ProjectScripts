@@ -22,26 +22,22 @@ output() {
 			fi
 			if [ $is_apache ];then
 			software=$(echo $version | grep -io "Apache")
-			version_num=$(echo $version | grep -Eo '[0-9]+\.[0-9]+\.')
-			version_num="${version_num}x"
+			version_num=$(echo $version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
 			securitylookup $software $version_num $file_name
 			fi
 			if [ $is_nginx ];then
 			software=$(echo $version | grep -io "nginx")
-			version_num=$(echo $version | grep -Eo '[0-9]+\.[0-9]+\.')
-			version_num="${version_num}x"
+			version_num=$(echo $version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
 			securitylookup $software $version_num $file_name
 			fi
 			if [ $is_gunicorn ];then
 			software=$(echo $version | grep -io "gunicorn")
-			version_num=$(echo $version | grep -Eo '[0-9]+\.[0-9]+\.')
-			version_num="${version_num}x"
+			version_num=$(echo $version | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
 			securitylookup $software $version_num $file_name
 			fi
 			if [ $is_iis ];then
 			software=$(echo $version | grep -io "Microsoft-IIS")
 			version_num=$(echo $version | grep -Eo '[0-9]+\.[0-9]+\.')
-			version_num="${version_num}x"
 			securitylookup $software $version_num $file_name
 			fi
 		else
@@ -78,8 +74,7 @@ output() {
 			if [ $found_asp_xpb ];then
 				echo "ASP version discovered by XPB Header: "$asp_extra_check >> $file_name
 				software=$(echo $asp_extra_check | grep -io "ASP")
-				version_num=$(echo $asp_extra_check | grep -Eo '[0-9]+\.[0-9]+\.')
-				version_num="${version_num}x"
+				version_num=$(echo $asp_extra_check | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
 				securitylookup $software $version_num $file_name
 			else
 				echo "ASP undiscovered by XPB Header" >> $file_name
@@ -89,8 +84,7 @@ output() {
 		if [ $found_php_xpb ];then
 			echo "PHP version discovered by XPB Header: "$php_check >> $file_name
 			software=$(echo $Header_Data | grep -io "PHP")
-			version_num=$(echo $Header_Data | grep -Eo '[0-9]+\.[0-9]+\.')
-			version_num="${version_num}x"
+			version_num=$(echo $Header_Data | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
 			securitylookup $software $version_num $file_name
 		else
 			echo "PHP undiscovered by XPB Header" >> $file_name
@@ -258,7 +252,7 @@ output() {
 			while read line; do
 				echo $line >> $file_name
 				software=$(echo $line | grep -o '^[^[:space:]]*')
-				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+')
+				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
 				securitylookup $software $version_num $file_name
 			done < wap_output_for_security_check_js
 			echo -e "For the full results of JavaScript technologies, please refer to JavaScript_Wappalyzer.txt\n" >> $file_name
@@ -282,8 +276,7 @@ output() {
 			while read line; do
 				echo $line >> $file_name
 				software=$(echo $line | grep -o '^[^[:space:]]*')
-				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+\.')
-				version_num="${version_num}x"
+				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
 				securitylookup $software $version_num $file_name
 			done < wap_output_for_security_check_pl
 			echo -e "For the full results of Programming Languages, please refer to Languages_Wappalyzer.txt\n" >> $file_name
@@ -307,8 +300,7 @@ output() {
 			while read line; do
 				echo $line >> $file_name
 				software=$(echo $line | grep -o '^[^[:space:]]*')
-				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+\.')
-				version_num="${version_num}x"
+				version_num=$(echo $line | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+')
 				securitylookup $software $version_num $file_name
 			done < wap_output_for_security_check_ws
 			echo "If this information conflicts with the first test it's likely that this is more reliable" >> $file_name		
