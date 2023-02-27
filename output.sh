@@ -2,8 +2,6 @@
 
 output() {
 	#Making the timestamped file
-	timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
-	file_name=$host"_"$timestamp".txt"
 	touch $file_name
 	
 	#The following is the procedure of getting the results of each test into a text file
@@ -261,7 +259,7 @@ output() {
 		fi
 	else
 		if [ $wap ];then
-			echo -e "Wappalyzer test successful but could not discover any JavaScript technologies\n" >> $file_name
+			echo -e "No JavaScript technologies discovered by Wappalyzer\n" >> $file_name
 		else
 			echo -e "Wappalyzer test could not run or bypass flag was given\n" >> $file_name
 		fi
@@ -284,7 +282,6 @@ output() {
 		else
 			echo -e "Programming Languages discovered but contain no version number. Please refer to Languages_Wappalyzer.txt\n" >> $file_name
 		fi
-		
 	else
 		if [ $wap ];then
 			echo -e "No Programming Languages discovered by Wappalyzer\n" >> $file_name
@@ -305,14 +302,11 @@ output() {
 			done < wap_output_for_security_check_ws
 			echo "If this information conflicts with the first test it's likely that this is more reliable" >> $file_name		
 		else
-			ws_wc=$(cat wap_output_for_security_check_ws | wc -w)
-			if [[ $ws_wc != 0 ]];then
-				echo "Webserver Software discovered by Wappalyzer but no version given. Please refer to Webserver_Wappalyzer.txt" >> $file_name
-			else
-				if [ $wap ];then
-				echo "No Webserver Software discovered by Wappalyzer" >> $file_name
-				fi
-			fi
+			echo "Webserver Software discovered by Wappalyzer but no version given. Please refer to Webserver_Wappalyzer.txt" >> $file_name
+		fi
+	else
+		if [ $wap ];then
+			echo "No Webserver Software discovered by Wappalyzer" >> $file_name
 		fi
 	fi
 	rm wap_output_for_security_check_ws 2>/dev/null

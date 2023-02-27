@@ -55,6 +55,12 @@ if [[ $publicsite == 'y' ]];then
 	fi
 fi
 
+timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
+file_name=$host"_"$timestamp".txt"
+mkdir $file_name
+cp official-cpe-dictionary_v2.3.xml $file_name
+cd $file_name
+
 #The beginning of the tests
 
 webservercheck #Will attempt to identify the host's webserver software based upon returned headers
@@ -127,3 +133,6 @@ if [[ $output == 'y' ]];then
 else
 	echo "End of script"
 fi
+
+rm official-cpe-dictionary_v2.3.xml
+cd ..

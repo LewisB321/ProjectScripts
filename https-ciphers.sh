@@ -75,7 +75,7 @@ echo_results() {
 		done
 	done
 
-	cipher_file_name=$host"_"$timestamp"Cipher_Analysis.txt" #Setting up a seperate timestamped text file just with the nmap results
+	cipher_file_name=$host"_Cipher_Analysis.txt" #Setting up a seperate timestamped text file just with the nmap results
 	cat nmapoutput.txt > $cipher_file_name
 	rm nmapoutput.txt
 

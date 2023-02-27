@@ -25,7 +25,7 @@ wappalyzer(){
 	
 	wap_javascript_check
 	wap_programming_language_check
-	wap_webserver_check
+	wap_webserver_check #Couldn't get to work properly alongside vulnerability lookup
 
 
 
@@ -288,10 +288,11 @@ wap_webserver_check(){
 	touch wap_output_for_security_check_ws
 	
 	while IFS= read -r line; do #not doing vulnerability lookup so no need for the if statement
+	if [[ $line =~ [0-9] ]]; then
 		next_line=$(IFS= read -r; echo "$REPLY")
 		echo "$next_line $line"
+	fi
 	done < temp2 > wap_output_for_security_check_ws
-	
 	#removing the string applications: which sometimes occurs and messes up the API lookup
 	sed -i 's/^applications://' wap_output_for_security_check_ws
 	
