@@ -6,11 +6,11 @@ phpinfo(){
 	 #Again, not perfect because the size could be dynamic but I see this as the most likely method
 
 	 if [[ $publicsite == "y" ]];then
-		php_returncode=$(curl -sI https://$host/phpinfo.php | grep "HTTP" | awk '{print $2}')
+		php_returncode=$(curl -sIL https://$host/phpinfo.php | grep "HTTP" | awk '{print $2}')
 		indexpage=$(curl -sI -L https://$host | wc -c)	
 		phpinfopage=$(curl -sI -L https://$host/phpinfo.php | wc -c)
 	 else
-	 	php_returncode=$(curl -sI http://$host/phpinfo.php | grep "HTTP" | awk '{print $2}')
+	 	php_returncode=$(curl -sIL http://$host/phpinfo.php | grep "HTTP" | awk '{print $2}')
 	 	indexpage=$(curl -sI -L http://$host | wc -c)	
 		phpinfopage=$(curl -sI -L http://$host/phpinfo.php | wc -c)
 	 fi
@@ -18,20 +18,23 @@ phpinfo(){
 	 if [ $indexpage -eq $phpinfopage ];then
 	 	echo "Silent redirect detected. phpinfo.php most likely not present"
 	 else
-	 	if [[ $php_returncode == 200 ]];then
-	 		echo -e "\nphpinfo.php found. Visit {host}/phpinfo.php to confirm"
-	 		found_phpinfo=true
-	 	else
-	 		if [[ $php_returncode == 403 ]];then
+	 	case $php_returncode in
+	 	
+	 		*200*)
+	 			echo "phpinfo.php potentially discovered at /phpinfo.php"
+	 			found_phpinfo=true
+	 			;;
+	 		*403*)
 	 			echo "Permission to access phpinfo.php blocked"
-	 		else
-	 			if [[ $php_returncode == 301 ]];then
-	 				echo "Redirect detected when trying to access /phpinfo.php"
-	 			else
-	 				echo -e "\nphpinfo.php not detected"
-	 			fi
-	 		fi
-	 	fi
+	 			;;
+	 		*301*)
+	 			echo "Redirect detected when trying to access /phpinfo.php. Most likely does not exist"
+	 			;;
+	 		*)
+	 			echo "phpinfo.php not detected"
+	 			;;
+	 	esac
+	 	
 	 fi
 }
 
@@ -39,34 +42,33 @@ phpmyadmin(){
 
 	 #This test will use curl to check the response to access attempts for phpmyadmin in its default location
 	 if [[ $publicsite == "y" ]];then
-	 	myadmin_returncode=$(curl -sI https://$host/phpmyadmin/ | grep "HTTP" | awk '{print $2}')
+	 	myadmin_returncode=$(curl -sIL https://$host/phpmyadmin | grep "HTTP" | awk '{print $2}')
 	 	indexpage=$(curl -sI -L https://$host | wc -c)	
 		phpmyadminpage=$(curl -sI -L https://$host/phpmyadmin | wc -c)
 	 else
-	 	myadmin_returncode=$(curl -sI http://$host/phpmyadmin/ | grep "HTTP" | awk '{print $2}')
+	 	myadmin_returncode=$(curl -sIL http://$host/phpmyadmin | grep "HTTP" | awk '{print $2}')
 	 	indexpage=$(curl -sI -L http://$host | wc -c)	
 		phpmyadminpage=$(curl -sI -L http://$host/phpmyadmin | wc -c)
 	 fi
-	 #echo $myadmin_returncode
+
 	 if [ $indexpage -eq $phpmyadminpage ];then
 	 	echo "Silent redirect detected. phpmyadmin most likely not present"
 	 else
-	 	if [[ $myadmin_returncode == 200 ]];then
-	 		found_phpmyadmin=true
-	 		echo -e "\nphpmyadmin directory detected. Visit {host}/phpmyadmin to confirm this"
-	 	else
-	 		if [[ $myadmin_returncode == 403 ]];then
-	 			echo -e "\nPermission to access phpmyadmin blocked"
-	 		else
-	 			if [[ $myadmin_returncode == 301 ]];then
-	 				echo "Redirect detected when trying to access /phpmyadmin"
-	 			else
-					echo -e "\nphpmyadmin not detected"
-				fi
-	 		fi
-	 	fi
+	 	case $myadmin_returncode in
+	 	
+	 		*200*)
+	 			echo "phpmyadmin directory potentially accessible at /phpmyadmin"
+	 			found_phpmyadmin=true
+	 			;;
+	 		*403*)
+	 			echo "Permission to access phpmyadmin blocked"
+	 			;;
+	 		*301*)
+	 			echo "Redirect detected when trying to access /phpmyadmin. Most likely does not exist"
+	 			;;
+	 		*)
+	 			echo "phpmyadmin not detected"
+	 			;;
+	 	esac
 	 fi
-
-	
-
 }

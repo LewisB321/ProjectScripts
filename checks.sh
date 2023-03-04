@@ -31,28 +31,31 @@ echo "Thank you for using this script. Please contact"
 echo "lewisblythe0121@gmail.com if something doesn't work"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
-
 if [[ $publicsite == 'y' ]];then
 	response=$(curl -s --fail --max-time 15 https://$host 2>/dev/null) #Initial curl request to try and catch bad hosts. Upgraded from pingtest
 	exit_code=$?
-	if [[ $exit_code == 35 ]];then
-		echo "Host is refusing certain curl connections, so this script will not behave properly. Stopping script execution"
-		exit
-	fi
-	if [[ $exit_code == 6 ]];then
-		echo "Host is unreachable. Stopping script execution"
-		exit
-	fi
-	if [[ $exit_code == 60 ]];then
-		echo "Host's SSL certificate cannot be trusted. Stopping script execution"
-		echo "You may want to try -p n to try HTTP rather than HTTPS but the script"
-		echo "may misbehave and show innacurate results if port80 is closed/filtered"
-		exit
-	fi
-	if [[ $exit_code == 28 ]];then
-		echo "Host is taking too long to respond. Stopping script execution"
-		exit
-	fi
+	case $exit_code in
+	
+		35)
+			echo "Host is refusing certain curl connections, so this script will not behave properly. Stopping script execution"
+			exit
+			;;
+			
+		6)
+			echo "Host is unreachable. Stopping script execution"
+			exit
+			;;
+		60)
+			echo "Host's SSL certificate cannot be trusted. Stopping script execution"
+			echo "You may want to try -s n to try HTTP rather than HTTPS but the script"
+			echo "may misbehave and show innacurate results if port80 is closed/filtered"
+			exit
+			;;
+		28)
+			echo "Host is taking too long to respond. Stopping script execution"
+			exit
+			;;
+	esac
 fi
 
 timestamp=$(date +"%Y-%m-%d_%H:%M:%S")
@@ -73,39 +76,38 @@ echo -e "\n"
 
 xpoweredby #Will attempt to read the x-powered-by header which sometimes discloses used technologies
 
-
 if [[ $resourceskip == "y" ]];then
 	false
 else
+	echo -e "\n"
 	resourceaccess #Will attempt to read /resources and return anything with the .php or .js extension
+	echo -e "\n"
+	jsfolderaccess #Will attempt to read /js and return anything with the .js extension
 fi
+
+echo -e "\n"
 
 mention #Will attempt to read the host's index source code and return any mention of JavaScript scripts (not simply the string)
 
-if echo $* | grep -e "-w" -q;then
-	if [[ $wapp == "y" ]];then
-		wappalyzer #Uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
-	else
-		false
-	fi
-else
-	false
+echo -e "\n" 
+
+nmapscript_referer #Uses an nmap script to find any third-party script usage
+
+echo -e "\n"
+
+if [[ $wapp == "y" ]];then
+	wappalyzer #Uses the API of the Wappalyzer tool to scrape web info and see if we find JS information that way
 fi
 
 if [[ $phpskip == 'y' ]];then
 	false
 else
+	echo -e "\n"
 	phpinfo #Will make a curl request to /phpinfo.php to discover whether it exists
 	phpmyadmin #Will make a curl request to /phpmyadmin to discover whether it exists
 fi
 
-nmapscript_referer #Uses an nmap script to find any third-party script usage
-
-if [[ $resourceskip == "y" ]];then
-	false
-else
-	jsfolderaccess #Will attempt to read /js and return anything with the .js extension
-fi
+echo -e "\n"
 
 etag_check #Simply checks for the eTag header which may cause a small security risk
 

@@ -30,6 +30,7 @@ httpmethods(){
 	#final check whether unsecure methods are present
 	if [[ $methods_wc == 0 ]];then
 		echo "No http methods could be identified"
+		return 0
 	else
 		found_methods=true
 		#read into an array
@@ -50,8 +51,7 @@ httpmethods(){
 			if [[ $no_hidden_chars == "CONNECT" ]];then
 				((unsecuremethodcounter=unsecuremethodcounter+1))
 			fi
-			if [[ $no_hidden_chars == "TRACE" ]]
-			then
+			if [[ $no_hidden_chars == "TRACE" ]];then
 				((unsecuremethodcounter=unsecuremethodcounter+1))
 			fi
 			if [[ $no_hidden_chars == "PATCH" ]];then
@@ -65,7 +65,7 @@ httpmethods(){
 			echo "There are $unsecuremethodcounter unsecure http methods supported by the host"
 			echo -e "\nFor more information on http methods please visit developer.mozilla.org/en-US/docs/Web/HTTP/Methods"
 		else
-			echo "No unsecure http methods discovered"
+			echo "No unsecure http methods present"
 		fi
 	fi
 }

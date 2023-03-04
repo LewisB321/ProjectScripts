@@ -17,9 +17,10 @@ xpoweredby(){
 
 	#Variable empty if header not there
 	if [[ $test_xpb == 0 ]];then
-		echo -e "\nX-Powered-By header not present"
+		echo -e "X-Powered-By header not present"
+		return 0
 	else
-		echo -e "\nX-Powered-By header present. Attempting to discover technologies\n"
+		echo -e "X-Powered-By header present. Attempting to discover technologies\n"
 		xpb=true
 		#echo $Header_Data
 		frameworkcheck

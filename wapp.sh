@@ -11,21 +11,21 @@ wappalyzer(){
 	#The api call will return invalid if the remote host can't be found. This if statement is to determine this
 	#And only print the output if the test was successful
 	if echo $wappresults | grep -qE "Invalid|could not be resolved";then
-		echo -e "\nWappalyzer test unsuccessful. It's very likely that the host could not be queried or the API key has ran out"
+		echo "Wappalyzer test unsuccessful. It's very likely that the host could not be queried or the API key has ran out"
 		return 0
 	else
 		#Read the raw output from the API into an array seperated by commas
 		wap=true
 		IFS=',' read -r -a wapparray <<< $wappresults
 		#Prints the array. Must find a way to clean this up
-		echo -e "\nWappalyzer test successful. Output is too large for the command line. Please refer to the text files"
+		echo "Wappalyzer test successful. Output is too large for the command line. Please refer to the outputted text files"
 		#echo "Raw Wappalyzer output: " ${wapparray[@]}
 	fi
 	
 	
 	wap_javascript_check
 	wap_programming_language_check
-	wap_webserver_check #Couldn't get to work properly alongside vulnerability lookup
+	wap_webserver_check
 
 
 

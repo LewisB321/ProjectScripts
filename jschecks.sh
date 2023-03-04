@@ -11,12 +11,10 @@ nmapscript_referer(){
 		nmap -o nmap_script_output.txt -p80,443 --script http-referer-checker.nse $host >/dev/null
 	fi
 
-	#Used to store wordcount
+	#Wordcount
 	test_nmap=$(cat nmap_script_output.txt | grep "Couldn't find any cross-domain scripts" | wc -w)
 	if [[ $test_nmap == 0 ]];then
 		test_nmap=$(cat nmap_script_output.txt | grep -i "Closed" | wc -w)
-	else
-		false
 	fi
 
 
@@ -60,40 +58,45 @@ jsfolderaccess() {
 	if [ $indexpage -eq $jsfolder ];then
 		echo "Silent redirected detected when attempting to access /js"
 	else	
-		if [[ ! $returncode =~ 200 ]];then
-			if [[ $returncode =~ 403 ]];then
-				echo "Permission denied for the /js folder"
-			else
-				echo -e "\nJS folder not present"
-			fi
-		else
-			#Grep mention of javascript then get the wordcount of that. 0 if nothing is found
-			js_folder_accessed=true
-			curl -sL -o JSfolder.txt $host/js/ 
-			jsfolderfiles=$(grep -o -P 'href=.*\.js(?=">)' JSfolder.txt | sed 's/href="//')
-			jsfolderfiles_wc=$(echo $jsfolderfiles | wc -w)
-			rm JSfolder.txt
+		case $returncode in
+			
+			*403*)
+				echo "Permission denied when attempting to access /js"
+				return 0
+				;;
+			*200*)
+				echo "JS folder potentially identified but cannot be guaranteed"
+				#Grep mention of javascript then get the wordcount of that. 0 if nothing is found
+				js_folder_accessed=true
+				curl -sL -o JSfolder.txt $host/js/ 
+				jsfolderfiles=$(grep -o -P 'href=.*\.js(?=">)' JSfolder.txt | sed 's/href="//')
+				jsfolderfiles_wc=$(echo $jsfolderfiles | wc -w)
+				rm JSfolder.txt
 	
-			if [[ $jsfolderfiles_wc == 0 ]];then
-				echo -e "\nJS folder found but no mention of JavaScript found"
-				echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
-			else
-				js_in_js_folder=true
-				echo -e "\nJS identified in the JS folder"
-				echo "Below are all the discovered files in /js that contain the .js extension:"
+				if [[ $jsfolderfiles_wc == 0 ]];then
+					echo "No mention of JavaScript found"
+					echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
+				else
+					js_in_js_folder=true
+					echo "JS identified"
+					echo "Below are all the discovered files in /js that contain the .js extension:"
 
-				#Using sed to remove instances of space that mess with how the string is read into the array
-				jsfolderfiles=$(echo $jsfolderfiles | sed 's/[[:space:]]*$//')
-				IFS=' ' read -ra allfiles <<< $jsfolderfiles
-				for element in ${allfiles[@]}
-				do
-					echo $element
-				done
-				declare -x allfiles
-
-				echo -e "\nNote: These are only the scripts used on the host, they may not contain any indication of vulnerability or version number(s)"
-			fi
-		fi
+					#Using sed to remove instances of space that mess with how the string is read into the array
+					jsfolderfiles=$(echo $jsfolderfiles | sed 's/[[:space:]]*$//')
+					IFS=' ' read -ra allfiles <<< $jsfolderfiles
+					for element in ${allfiles[@]}
+					do
+						echo $element
+					done
+					declare -x allfiles
+				
+					echo -e "\nNote: These are only the scripts used on the host, they may not contain any indication of vulnerability or version number(s)"
+				fi
+				;;
+			*)
+				echo "Unknown error occured when trying to access /js. Unable to determine existence"
+				;;
+		esac
 	fi
 
 }

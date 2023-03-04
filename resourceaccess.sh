@@ -7,21 +7,23 @@ resourceaccess() {
 	if [[ $publicsite == "y" ]];then
 		returncode=$(curl -sI -L https://www.$host/resources/ | grep "HTTP" | awk '{print $2}')
 		indexpage=$(curl -sI -L https://$host | wc -c)	
-		resourcefolder=$(curl -sI -L https://$host/resources | wc -c)
+		resourcefolder=$(curl -sI -L https://$host/resources/ | wc -c)
 	else
 		returncode=$(curl -sI -L http://$host/resources/ | grep "HTTP" | awk '{print $2}')
 		indexpage=$(curl -sI -L http://$host | wc -c)	
-		resourcefolder=$(curl -sI -L http://$host/resources | wc -c)
+		resourcefolder=$(curl -sI -L http://$host/resources/ | wc -c)
 	fi
 
 	#Silent direct checker. Not perfect but works sometimes
 	if [ $indexpage -eq $resourcefolder ];then
 		echo "Silent redirect detected when attempting to access /resources"
+		return 0
 	else
 		if [[ ! $returncode =~ 200 ]];then
-			echo -e "\nResources folder not present"
+			echo "Resources folder not present"
+			return 0
 		else
-			echo -e "\n/resources folder found"
+			echo "Resources folder found"
 			echo "Note: Some hosts may use this space for a different purpose and this test does not make that distinction"
 			echo "If you know a host is using this space for a different purpose, please use the -r flag"
 			resource_folder_accessed=true
