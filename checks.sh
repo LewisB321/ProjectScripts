@@ -77,7 +77,7 @@ echo -e "\n"
 xpoweredby #Will attempt to read the x-powered-by header which sometimes discloses used technologies
 
 if [[ $resourceskip == "y" ]];then
-	false
+	echo -e "\nResource skip flag detected. Skipping checks for /resources and /js"
 else
 	echo -e "\n"
 	resourceaccess #Will attempt to read /resources and return anything with the .php or .js extension
@@ -100,7 +100,7 @@ if [[ $wapp == "y" ]];then
 fi
 
 if [[ $phpskip == 'y' ]];then
-	false
+	echo -e "\nphp skip flag detected. Skipping checks for /phpinfo.php and /phpmyadmin"
 else
 	echo -e "\n"
 	phpinfo #Will make a curl request to /phpinfo.php to discover whether it exists
