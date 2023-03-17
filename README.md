@@ -1,11 +1,13 @@
 # ProjectScripts
 
-CHECKS.SH = MAIN SCRIPT. ONLY USE THIS, OTHERS ARE JUST WHERE THE FUNCTIONS ARE
+Working on re-organising the tool to implement an actual name
+
+CHECKS.SH = main script. Please use this as the other scripts are just areas for functions
 
 Flags:
 
+s - Secure. Will try http if secure is set to no, yes means https
 
-s - Secure (https)
 
 h - Hostname. Can be url or ip. Takes port number as an argument as well i.e. 172.17.0.2:3000
 
@@ -19,13 +21,15 @@ r - Resource(skip). Skips the checks for /resources and /js if you know it's use
 p - PHP(skip). Skips the checks for phpinfo.php and /phpmyadmin if you know the host isn't using PHP
 
 
-These flags are no by default so you only have to specify if you want them on (Y)
+Flags are set to no by default
 
 
 PUBLIC EXAMPLE:
 bash checks.sh -h gigabyte.com -s y -w y -r n -p n
 
+
 PRIVATE EXAMPLE:
 bash checks.sh -h localhost
 
-At the end you'll be asked if you want to output findings to a text file. If yes, you'll get all of the collated information alongside a brief vulnerability lookup using the following API: https://services.nvd.nist.gov/rest/json/cves/2.0
+
+At the end you'll be asked if you want to output findings to a text file, placed inside it's own unique folder. If yes, you'll get all of the collated information alongside a brief vulnerability lookup using the following API: https://services.nvd.nist.gov/rest/json/cves/2.0. The vulnerability checks only run on an outputted text file. Semi-cleaned Wappalyzer findings are also provided to see what the tool has returned incase it's not reflected well inside the main text file.
