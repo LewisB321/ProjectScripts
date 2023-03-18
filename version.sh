@@ -36,6 +36,7 @@ type=$(echo $version | grep -iof supportedchecklist | wc -w)
 if [[ $type == 0 ]];then
 	echo "This script does not yet support this web server software"
 	not_supported_ws=true
+	rm supportedchecklist
 	return 0
 fi
 rm supportedchecklist
