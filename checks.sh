@@ -111,20 +111,23 @@ echo -e "\n"
 
 etag_check #Simply checks for the eTag header which may cause a small security risk
 
-echo -e "\nNow probing target to determine TLS ciphersuite"
+if [[ $publicsite == 'y' ]];then
+	echo -e "\nNow probing target to determine TLS ciphersuite"
+	#the below code will make a curl request to see if host responds to https requests. Will be empty
+	#if https is unavailable, meaning the ciphersuite analysis will be bypassed
+	#could do this using openssl -connect but this achieves the same goal
+	httpscheck=$(curl -sL https://$host)
+	httpscheck_wc=$(echo $httpscheck | wc -w)
 
-#the below code will make a curl request to see if host responds to https requests. Will be empty
-#if https is unavailable, meaning the ciphersuite analysis will be bypassed
-#could do this using openssl -connect but this achieves the same goal
-httpscheck=$(curl -sL https://$host)
-httpscheck_wc=$(echo $httpscheck | wc -w)
-
-#will run enum ciphers if https is possible
-if [[ $httpscheck_wc == 0 ]];then
-	echo "Host is unsuitable for ciphersuite analysis (cannot be contacted on port 443)"
+	#will run enum ciphers if https is possible
+	if [[ $httpscheck_wc == 0 ]];then
+		echo "Host is unsuitable for ciphersuite analysis (cannot be contacted on port 443)"
+	else
+		echo "Host is suitable for ciphersuite analysis"
+		enum_ciphers
+	fi
 else
-	echo "Host is suitable for ciphersuite analysis"
-	enum_ciphers
+	echo -e "\nHost is not using SSL/TLS Encryption, therefore skipping ciphersuite analysis"
 fi
 
 #Calls the output script if user selects yes
