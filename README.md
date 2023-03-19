@@ -26,6 +26,8 @@ Flags are set to no by default
 
 PUBLIC EXAMPLE:
 bash checks.sh -h gigabyte.com -s y -w y -r n -p n
+
+
 bash checks.sh -h httpbin.org -s y -w y -r y -p y
 
 
