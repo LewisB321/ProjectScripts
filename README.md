@@ -1,6 +1,6 @@
 # ProjectScripts
 
-Working on re-organising the tool to implement an actual name
+Working on re-organising the tool to implement an actual name. Prior to running please unzip the cpe dictionary, it's absolutely necessary in order to run the vulnerability lookups
 
 CHECKS.SH = main script. Please use this as the other scripts are just areas for functions
 
@@ -26,6 +26,7 @@ Flags are set to no by default
 
 PUBLIC EXAMPLE:
 bash checks.sh -h gigabyte.com -s y -w y -r n -p n
+bash checks.sh -h httpbin.org -s y -w y -r y -p y
 
 
 PRIVATE EXAMPLE:
